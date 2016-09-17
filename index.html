@@ -1,11 +1,12 @@
 <html>
 <head>
-<title>Chen J.C.</title>
+<title>Raven's Homepage</title>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 
 <script src="js/jquery-1.12.2.min.js"></script>
 <script type="text/javascript">
-
+var num1, num2, theta = 0
+var path
 var nowindex=0;
 var ismoving=false;
 var mousewheel=document.all?"mousewheel":"DOMMouseScroll";
@@ -19,7 +20,7 @@ var scrollFunc=function(e){
         t=e.detail;
     }
 	
-	if (!ismoving){
+	if(!ismoving){
 		var flag=0;
 		if ((t>0 && t!=3) || (t==-3)){
 			if(nowindex>0){
@@ -59,6 +60,8 @@ $(document).ready(function(){
 	}//W3C
 	window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome/Safari
 	//http://www.cnblogs.com/walkingp/archive/2010/02/03/1662872.html
+	path = document.getElementById('path')
+	setInterval("animationFunction()",25)
 });
 
 function makeActive(nowindex){
@@ -74,18 +77,20 @@ function multiScroll(nowindex){
 	});
 }
 
-document.onkeydown = function(ev){
-	
-	var oEvent = ev || event;
-	
-	if(oEvent.keyCode==38 || oEvent.keyCode==40){
-		
-		return false
-		
-		}
-	
-	};
+function animationFunction(){
+	num1 = Math.round(85 + 70 * Math.cos(theta))
+	num2 = 200 - num1
+	path.setAttribute("d", "M100,0C"+num1+",0,200,"+num2+",200,100S"+num1+",200,100,200S0,"+num1+",0,100S"+num2+",0,100,0")
+	theta += 0.075
+	if(theta >= 2*Math.PI) theta -= 2*Math.PI
+}
 
+document.onkeydown = function(ev){
+	var oEvent = ev || event;
+	if(oEvent.keyCode==38 || oEvent.keyCode==40){
+		return false;
+	}
+}
 </script>
 
 <style> 
@@ -174,7 +179,20 @@ h1{
 
 p{
 	display: inline;
-	font-family:'Microsoft Yahei', arial, "STHeiti", sans-serif;
+	font-family: 'Microsoft Yahei', arial, "STHeiti", sans-serif;
+}
+
+#animation{
+	animation-name: myrotate;
+	animation-duration: 2.5s;
+	transform-style: preserve-3d;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
+
+@keyframes myrotate{
+	from {transform:translate(50%, -50%) rotateY(0deg);}
+	to {transform:translate(50%, -50%) rotateY(360deg);}
 }
 </style>
 </head>
@@ -191,14 +209,12 @@ p{
 
 	<div class="left">
 		<div class="leftchild" style="background-color: #1a1a1a; top: 0%; z-index: 10;">
-			<div class="bgimg"  style="position: absolute; width: 100%; height: 100%; overflow: hidden;">
-			</div>
 			<div style="width:16em; position: absolute; left: 100%; bottom: 50%; transform: translate(-50%, -10%); text-align: center; word-break: keep-all;">
 				<img class="hdimg" src="img/headimg.jpg" />
 			</div>
 		</div>
 		<div class="leftchild" style="background-color: #002531; top: 100%; z-index: 10;">
-			<div style="width:24em; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: left; word-break: keep-all;">
+			<div style="width:20em; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: left; word-break: keep-all;">
 				<p style="font-size: 2em; color: #fff">Projects</p>
 				<br />
 				<br />
@@ -211,15 +227,14 @@ p{
 		</div>
 
 		<div class="leftchild" style="background-color: #212118; top: 200%;">
-			<div class="bgimg"  style="position: absolute; width: 100%; height: 100%; overflow: hidden;">
+			<div class="bgimg"  style="position: absolute; width: 100%; height: 100%; overflow: hidden; perspective: 810px;">
+				<div id="animation" style="width: 270px; height: 270px; border: 6px solid #f88; position: absolute; right: 50%; top: 50%;"></div>
 			</div>
 		</div>
 	</div>
 	
 	<div class="right">
 		<div class="rightchild" style="background-color: #1a1a1a; bottom: 0%;">
-			<div class="bgimg"  style="position: absolute; width: 100%; height: 100%; overflow: hidden;">
-			</div>
 			<div style="width:16em; position: absolute; right: 100%; top: 50%; transform: translate(50%, 10%); text-align: center; word-break: keep-all; z-index: 20;">
 				<p style="font-size: 2em; color: #fff">Raven</p>
 				<br />
@@ -231,11 +246,14 @@ p{
 
 		<div class="rightchild" style="background-color: #002531; bottom: 100%;">
 			<div class="bgimg"  style="position: absolute; width: 100%; height: 100%; overflow: hidden;">
+				<svg width="600px" height="900px" viewBox="0 -100 400 600" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);" version="1.1" xmlns="http://www.w3.org/2000/svg" >
+					<path id="path" d="M100,0C170,0,200,30,200,100S170,200,100,200S0,170,0,100S30,0,100,0" stroke="#f88" stroke-width="4" fill="none" transform="translate(100,100)"/>
+				</svg>
 			</div>
 		</div>
 
 		<div class="rightchild" style="background-color: #212118; bottom: 200%; z-index: 10;">
-			<div style="width:24em; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: left; word-break: keep-all;">
+			<div style="width:20em; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: left; word-break: keep-all;">
 				<p style="font-size: 2em; font-family:'Microsoft Yahei'; color: #fff">Contact Me</p>
 				<br />
 				<br />
