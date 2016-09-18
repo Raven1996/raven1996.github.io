@@ -5,7 +5,7 @@
 
 <script src="js/jquery-1.12.2.min.js"></script>
 <script type="text/javascript">
-var num1, num2, theta = 0
+var num1, num2, theta = 0, direction = 1;
 var path
 var nowindex=0;
 var ismoving=false;
@@ -61,7 +61,7 @@ $(document).ready(function(){
 	window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome/Safari
 	//http://www.cnblogs.com/walkingp/archive/2010/02/03/1662872.html
 	path = document.getElementById('path')
-	setInterval("animationFunction()",25)
+	setInterval("animationFunction()",20)
 });
 
 function makeActive(nowindex){
@@ -78,11 +78,15 @@ function multiScroll(nowindex){
 }
 
 function animationFunction(){
-	num1 = Math.round(85 + 70 * Math.cos(theta))
-	num2 = 200 - num1
-	path.setAttribute("d", "M100,0C"+num1+",0,200,"+num2+",200,100S"+num1+",200,100,200S0,"+num1+",0,100S"+num2+",0,100,0")
-	theta += 0.075
-	if(theta >= 2*Math.PI) theta -= 2*Math.PI
+	num1 = 27.6 - 27.6*direction + 55.2*direction*Math.sqrt((2-theta)*theta);
+	num2 = - num1;
+	path.setAttribute("d", "M0,-100C"+num1+",-100,100,"+num2+",100,0S"+num1+",100,0,100S-100,"+num1+",-100,0S"+num2+",-100,0,-100Z");
+	path.setAttribute("transform", "scale("+(1.1-0.1*num1/55.2)+")");
+	theta += 0.025;
+	if(theta >= 1){
+		theta = 0;
+		direction *= -1;
+	}
 }
 
 document.onkeydown = function(ev){
@@ -114,12 +118,12 @@ body{
 #menu *{
 	margin: 0.25em 0.5em;
 	padding: 0.5em 1em;
-	font-weight: bold;
 	color: #222;
 	background-color: rgba(255, 255, 255, 0.482);
 	line-height: 3.2em;
 	border-radius: 0.5em;
 	text-decoration: none;
+	font-family: 'arial', 'Microsoft Yahei', "STHeiti", sans-serif;
 	-webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -163,7 +167,8 @@ h1{
 }
 
 .hdimg{
-	width: 61.8%;
+	width: 160px;
+	height: 160px;
 	border-radius: 50%;
 	border: 6px solid #fff;
 	transition: 0.25s;
@@ -179,7 +184,7 @@ h1{
 
 p{
 	display: inline;
-	font-family: 'Microsoft Yahei', arial, "STHeiti", sans-serif;
+	font-family: 'arial', 'Microsoft Yahei', "STHeiti", sans-serif;
 }
 
 #animation{
@@ -234,7 +239,7 @@ p{
 
 		<div class="leftchild" style="background-color: #212118; top: 200%;">
 			<div class="bgimg"  style="position: absolute; width: 100%; height: 100%; overflow: hidden; perspective: 810px;">
-				<div id="animation" style="width: 270px; height: 270px; border: 6px solid #f88; position: absolute; right: 50%; top: 50%; transform: translate(50%, -50%);"></div>
+				<div id="animation" style="width: 256px; height: 256px; border: 6px solid #f88; position: absolute; right: 50%; top: 50%; transform: translate(50%, -50%);"></div>
 			</div>
 		</div>
 	</div>
@@ -252,8 +257,8 @@ p{
 
 		<div class="rightchild" style="background-color: #002531; bottom: 100%;">
 			<div class="bgimg"  style="position: absolute; width: 100%; height: 100%; overflow: hidden;">
-				<svg width="600px" height="900px" viewBox="0 -100 400 600" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);" version="1.1" xmlns="http://www.w3.org/2000/svg" >
-					<path id="path" d="M100,0C170,0,200,30,200,100S170,200,100,200S0,170,0,100S30,0,100,0" stroke="#f88" stroke-width="4" fill="none" transform="translate(100,100)"/>
+				<svg width="600px" height="900px" viewBox="-200 -300 400 600" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);" version="1.1" xmlns="http://www.w3.org/2000/svg" >
+					<path id="path" d="" stroke="#f88" stroke-width="4" fill="none"/>
 				</svg>
 			</div>
 		</div>
