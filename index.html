@@ -1,12 +1,13 @@
 <html>
 <head>
 <title>Raven's Homepage</title>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 
 <script src="js/jquery-1.12.2.min.js"></script>
 <script type="text/javascript">
-var theta = 0, direction = 1;
-var path
+var theta = 0;
+var path;
 var nowindex=0;
 var ismoving=false;
 var mousewheel=document.all?"mousewheel":"DOMMouseScroll";
@@ -79,14 +80,13 @@ function multiScroll(nowindex){
 
 function animationFunction(){
 	var ratio = Math.sqrt((2-theta)*theta)
-	var num1 = 27.6 - 27.6*direction + 55.2*direction*ratio;
+	var num1 = 55.2-55.2*ratio;
 	var num2 = - num1;
 	path.setAttribute("d", "M0,-100C"+num1+",-100,100,"+num2+",100,0S"+num1+",100,0,100S-100,"+num1+",-100,0S"+num2+",-100,0,-100Z");
-	path.setAttribute("transform", "scale("+(1.1-0.1*num1/55.2)+") rotate("+ratio*90+" 0 0)");
+	path.setAttribute("transform", "scale("+(1+0.1*ratio)+") rotate("+90*(theta<1?ratio:2-ratio)+" 0 0)");
 	theta += 0.02;
-	if(theta >= 1){
+	if(theta >= 2){
 		theta = 0;
-		direction *= -1;
 	}
 }
 
