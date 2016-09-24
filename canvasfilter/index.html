@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<meta name="author" content="https://raven1996.github.io" />
+	<title>Canvas Filter</title>
+	<link href="css/style.css" type="text/css" rel="stylesheet"/>
+	<link href="https://fonts.googleapis.com/css?family=Yellowtail" rel="stylesheet" /> 
+</head>
+<body>
+	<div id="titlediv">
+		<p id="title">Canvas Filter</p>
+		<p id="instruction">Drop image below and get started!</p>
+		<a id="export">export</a>
+	</div>
+	<div id="belowdiv">
+		<span id="imgspan">
+			<div id="size">
+				<a class="sizebuttom" >100%</a>
+				<a class="sizebuttom" >suitable</a>
+			</div>
+			<div id="drop" width="100%" height="100%"></div>
+			<canvas id="canvasshow">
+			</canvas>
+			<canvas id="canvashidden" style="display: none;">
+			</canvas>
+		</span>
+		<span id="ctrlspan">
+			<div>
+			
+			</div>
+		</span>
+	</div>
+	<script src="js/canvasfx.js"></script>
+	<script>
+		var image = new Image()
+		window.onload = function(){
+			setCanvasById("canvashidden", "canvasshow")  // before using canvasfx function
+			image.src = "img/iron.jpg"  // sample image is from http://www.polayoutu.com/collections/4
+			image.onload = function(){
+				canvasA.setAttribute("width", image.width)
+				canvasA.setAttribute("height", image.height)
+				canvasB.setAttribute("width", image.width)
+				canvasB.setAttribute("height", image.height)
+				ctxA.drawImage(image, 0, 0, canvasA.width, canvasA.height)
+				noEffect()
+			}
+		}
+	</script>
+</body>
+</html>

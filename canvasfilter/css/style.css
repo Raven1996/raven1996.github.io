@@ -1,0 +1,98 @@
+body{
+	background-color: #202020;
+	color: #808080;
+	font-family: Helvetica, Arial, sans-serif;
+	margin: 0;
+	height: 100%;
+}
+
+a, p{
+	margin: 0;
+}
+
+a{
+	text-decoration: none;
+	color: #202020;
+	padding: 4px 8px;
+	border-radius: 4px;
+}
+
+#titlediv{
+	width: 100%;
+	height: 43px;
+	padding: 3px 0;
+	border-bottom: 1px solid #808080;
+	background-color: #404040;
+	overflow: hidden;
+}
+
+#title{
+	font-family: 'Yellowtail', Helvetica, Arial, sans-serif;
+	font-size: 32px;
+	display: inline;
+	color: #e0b942;
+	margin: 0 16px;
+}
+
+#instruction{
+	font-size: 1em;
+	display: inline;
+	color: #c0c0c0;
+}
+
+#export{
+	background-color: #c0c0c0;
+	float: right;
+	margin: 7px 16px 6px 0;
+}
+
+#export:hover{
+	background-color: #e0b942;
+}
+
+#belowdiv{
+	position: absolute;
+    top: 50px;
+    bottom: 0;
+	width: 100%;
+}
+
+#imgspan{
+	position: absolute;
+    right: 240px;
+	left: 0px;
+	height: 100%;
+	overflow: hidden;
+}
+
+#canvasshow{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index:-10;
+	border:#404040 1px solid;
+}
+
+#ctrlspan{
+	width: 240px;
+	height: 100%;
+	background-color: #404040;
+	margin: 0px;
+	float: right;
+	border-left:1px solid #202020;
+}
+
+#size{
+	position: absolute;
+	bottom: 0;
+	left: 8px;
+	height: 32px;
+	width: 200px;
+}
+
+.sizebuttom{
+	background-color: rgba(255, 255, 255, 0.5);
+	margin:6px 0px 6px 8px;
+	line-height: 12px;
+}
