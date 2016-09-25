@@ -23,6 +23,7 @@ a{
 	color: #202020;
 	padding: 4px 8px;
 	border-radius: 4px;
+	cursor: pointer;
 }
 
 #titlediv{
@@ -52,7 +53,7 @@ a{
 #export{
 	background-color: #c0c0c0;
 	float: right;
-	margin: 7px 16px 6px 0;
+	margin: 8px 16px 8px 0;
 }
 
 #export:hover{
@@ -81,6 +82,10 @@ a{
 	transform: translate(-50%, -50%);
 	z-index: -10;
 	border: #404040 1px solid;
+	transition: width 0.2s, height 0.2s;
+	-webkit-transition: width 0.2s, height 0.2s;
+	-moz-transition: width 0.2s, height 0.2s;
+	-o-transition: width 0.2s, height 0.2s;
 }
 
 #ctrlspan{
@@ -102,10 +107,14 @@ a{
 }
 
 .sizebuttom{
-	background-color: rgba(255, 255, 255, 0.5);
+	background-color: rgba(255, 255, 255, 0.4);
 	margin: 6px 0px 6px 8px;
 	line-height: 12px;
 	z-index: 10;
+}
+
+.sizebuttom:hover{
+	background-color: rgba(255, 255, 255, 0.6);
 }
 
 .catagory{
@@ -206,6 +215,10 @@ label{
 
 .inactive{
 	display: none;
+}
+
+.hover{
+	background-color: rgba(255, 255, 255, 0.1);
 }
 
 select{
