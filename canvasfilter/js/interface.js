@@ -20,24 +20,26 @@ window.onload = function(){
 				scaleCanvas(1)
 			}
 			var holder = document.getElementById('drop');
-			holder.addEventListener('dragenter', function(event){
+			holder.ondragenter = function(){
 				holder.className = 'hover'
-				event.stopPropagation()
-				event.preventDefault()
-			}, false)
-			holder.addEventListener('dragleave', function(event){
+				return false
+			}
+			holder.ondragleave = function(){
 				holder.className = ''
-				event.stopPropagation()
-				event.preventDefault()
-			}, false)
-			holder.addEventListener('drop', function(event){
+				return false
+			}
+			holder.ondragover = function(){
+				return false  // otherwise the page will be replaced by the image
+			}
+			holder.ondrop = function(e){
+				e.preventDefault()
+				e.stopPropagation()
 				holder.className = ''
-				event.preventDefault()
-				var file = event.dataTransfer.files[0], reader = new FileReader()
+				var file = e.dataTransfer.files[0], reader = new FileReader()
 				reader.onload = function(event){
 					img = new Image()
 					img.src = event.target.result
-					img.onload = function() {
+					img.onload = function(){
 						canvasA.setAttribute('width', this.width)
 						canvasA.setAttribute('height', this.height)
 						canvasB.setAttribute('width', this.width)
@@ -50,9 +52,8 @@ window.onload = function(){
 					}
 				}
 				reader.readAsDataURL(file)
-				event.stopPropagation()
-				event.preventDefault()
-			}, false)
+				return false
+			}
 		}
 
 function scaleCanvas(auto, type){
