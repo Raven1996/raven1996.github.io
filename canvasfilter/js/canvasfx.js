@@ -135,7 +135,7 @@ function motionHarrisEffect(length, degree, mask){  // Harris camera
 			var motion = [], ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // circle
+				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
 				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
 				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
 			}
@@ -332,7 +332,7 @@ function normalBlurEffect(radius, brightness, mask, type){
 			var ratio = 0
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // circle
+				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
 				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
 				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
 			}
@@ -463,7 +463,7 @@ function lenBlurEffect(radius, brightness, mask){
 			var ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // circle
+				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
 				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
 				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
 			}
@@ -554,7 +554,7 @@ function motionBlurEffect(length, degree, brightness, mask){
 			var ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // circle
+				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
 				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
 				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
 			}

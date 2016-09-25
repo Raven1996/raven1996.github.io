@@ -6,8 +6,16 @@ body{
 	height: 100%;
 }
 
-a, p{
+a, p, label{
 	margin: 0;
+	-webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+p{
+	cursor: default;
 }
 
 a{
@@ -24,6 +32,7 @@ a{
 	border-bottom: 1px solid #808080;
 	background-color: #404040;
 	overflow: hidden;
+	z-index: 10;
 }
 
 #title{
@@ -59,7 +68,7 @@ a{
 
 #imgspan{
 	position: absolute;
-    right: 240px;
+    right: 280px;
 	left: 0px;
 	height: 100%;
 	overflow: hidden;
@@ -70,17 +79,18 @@ a{
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	z-index:-10;
-	border:#404040 1px solid;
+	z-index: -10;
+	border: #404040 1px solid;
 }
 
 #ctrlspan{
-	width: 240px;
+	width: 280px;
 	height: 100%;
-	background-color: #404040;
+	background-color: #303030;
 	margin: 0px;
 	float: right;
-	border-left:1px solid #202020;
+	border-left: 1px solid #404040;
+	overflow: hidden;
 }
 
 #size{
@@ -93,6 +103,121 @@ a{
 
 .sizebuttom{
 	background-color: rgba(255, 255, 255, 0.5);
-	margin:6px 0px 6px 8px;
+	margin: 6px 0px 6px 8px;
 	line-height: 12px;
+	z-index: 10;
+}
+
+.catagory{
+	padding: 4px 6px 4px 6px;
+	border-top: 1px solid #202020;
+	color: #c0c0c0;
+}
+
+#ctrlspan p:first-child{
+	border: none;
+}
+
+.filterdiv{
+	width: 100%;
+}
+
+.filtername{
+	padding: 4px 0px 4px 16px;
+	cursor: pointer;
+}
+
+.filtername:hover{
+	color: #e0b942;
+}
+
+.applybuttom{
+	margin: 0px 16px;
+	padding: 0;
+	float: right;
+	text-decoration: underline;
+	color: #808080;
+}
+
+.applybuttom:hover{
+	color: #c0c0c0;
+}
+
+.ctrldiv{
+	width: 100%;
+	padding: 4px 0px 4px 32px;
+	background-color: #404040;
+}
+
+input[type="range"]{
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-color: rgba(0, 0, 0, 0);
+	width: 150px;
+	margin: 0px 8px -2px 8px;
+	height: 12px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+	-webkit-appearance: none;
+    height: 1px;
+	margin-bottom: 0px;
+    background-color: #808080;
+}
+
+input[type=range]::-moz-range-track {
+	-moz-appearance: none;
+    height: 1px;
+	margin-bottom: 0px;
+    background-color: #808080;
+}
+
+input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    margin-top: -6px; /*使滑块超出轨道部分的偏移量相等*/
+    background: #404040; 
+    border-radius: 50%; /*外观设置为圆形*/
+    border: solid 1px #808080; /*设置边框*/
+}
+
+input[type=range]::-moz-range-thumb{
+    -moz-appearance:none;
+    width: 12px;
+	height: 12px;
+    margin-top: -5px; /*使滑块超出轨道部分的偏移量相等*/
+    background: #404040; 
+    border-radius: 50%; /*外观设置为圆形*/
+    border: solid 1px #808080; /*设置边框*/
+}
+
+input[type=range]:focus{
+    outline: none;
+}
+
+label{
+	width: 72px;
+	line-height: 16px;
+	padding: 4px 0px;
+	display: inline-block;
+}
+
+.inactive{
+	display: none;
+}
+
+select{
+	color: #808080;
+	background-color: #404040;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	border: solid 1px #808080;
+	width: 150px;
+	margin: 0px 8px 0px 8px;
+}
+
+select:focus{
+    outline: none;
 }
