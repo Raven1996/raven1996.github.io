@@ -47,6 +47,7 @@ window.onload = function(){
 						ctxA.clearRect(0, 0, this.width, this.height)
 						ctxA.drawImage(this, 0, 0)
 						delete this
+						clickIndex(-1)
 						noEffect()
 						scaleCanvas(1)
 					}
@@ -82,13 +83,20 @@ function exportImg(){
 function clickIndex(index){
 	var applyButtom = document.getElementsByClassName('applybuttom')
 	var ctrlDiv = document.getElementsByClassName('ctrldiv')
-	if(hasClass(applyButtom[index], 'inactive')){
+	if(index==-1 || hasClass(applyButtom[index], 'inactive')){
 		for (i=0;i<applyButtom.length;i++){
-			i == index ? removeClass(applyButtom[i], 'inactive') : addClass(applyButtom[i], 'inactive')
-			i == index ? removeClass(ctrlDiv[i], 'inactive') : addClass(ctrlDiv[i], 'inactive')
+			if (i == index){
+				removeClass(applyButtom[i], 'inactive')
+				removeClass(ctrlDiv[i], 'inactive')
+				resetValues(index)
+				previewCanvas(index)
+			}else{
+				if (!hasClass(applyButtom[i], 'inactive')){
+					addClass(applyButtom[i], 'inactive')
+					addClass(ctrlDiv[i], 'inactive')
+				}
+			}
 		}
-		
-		previewCanvas(index)
 	}else{
 		addClass(applyButtom[index], 'inactive')
 		addClass(ctrlDiv[index], 'inactive')
@@ -96,23 +104,118 @@ function clickIndex(index){
 	}
 }
 
-function hasClass(obj, cls) {  
-	return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
+function hasClass(obj, cls) {
+	return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'))
+}
+  
+function addClass(obj, cls) {
+	if (!this.hasClass(obj, cls)) obj.className += ' ' + cls
 }  
   
-function addClass(obj, cls) {  
-	if (!this.hasClass(obj, cls)) obj.className += ' ' + cls;  
-}  
-  
-function removeClass(obj, cls) {  
-	if (hasClass(obj, cls)) {  
-		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');	
-		obj.className = obj.className.replace(reg, ' ');  
-	}  
-} 
+function removeClass(obj, cls) {
+	if (hasClass(obj, cls)) {
+		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
+		obj.className = obj.className.replace(reg, ' ')
+	}
+}
+
+function resetValues(index){
+	var div = document.getElementsByClassName("div"+index)
+	switch(index){
+		case 0:
+			div[0].value="0"
+			div[1].value="0"
+			div[2].value="0"
+			break
+		case 1:
+			div[0].value="0"
+			break
+		case 2:
+			div[0].value="-0.1"
+			break
+		case 3:
+			div[0].value="5"
+			div[1].value="30"
+			div[2].value="0"
+			break
+		case 4:
+			div[0].value="0.05"
+			break
+		case 5:
+			div[0].value="5"
+			div[1].value="0.25"
+			div[2].value="0"
+			div[3].value="0"
+			break
+		case 6:
+			div[0].value="2.5"
+			div[1].value="0.25"
+			div[2].value="0"
+			break
+		case 7:
+			div[0].value="5"
+			div[1].value="30"
+			div[2].value="0.25"
+			div[3].value="0"
+			break
+		case 8:
+			div[0].value="0.05"
+			div[1].value="0.25"
+			break
+		case 9:
+			div[0].value="10"
+			div[1].value="0"
+	}
+	
+}
 
 function previewCanvas(index){
-	greyEffect(0)
+	var div = document.getElementsByClassName("div"+index)
+	switch(index){
+		case 0:
+			hslEffect(parseInt(div[0].value),
+				parseInt(div[1].value),
+				parseInt(div[2].value))
+			break
+		case 1:
+			greyEffect(parseInt(div[0].value))
+			break
+		case 2:
+			distortionEffect(parseFloat(div[0].value))
+			break
+		case 3:
+			motionHarrisEffect(parseInt(div[0].value),
+				parseInt(div[1].value),
+				parseInt(div[2].value))
+			break
+		case 4:
+			zoomHarrisEffect(parseFloat(div[0].value))
+			break
+		case 5:
+			normalBlurEffect(parseFloat(div[0].value),
+				parseFloat(div[1].value),
+				parseInt(div[2].value),
+				parseInt(div[3].value))
+			break
+		case 6:
+			lenBlurEffect(parseFloat(div[0].value),
+				parseFloat(div[1].value),
+				parseInt(div[2].value))
+			break
+		case 7:
+			motionBlurEffect(parseFloat(div[0].value),
+				parseInt(div[1].value),
+				parseFloat(div[2].value),
+				parseInt(div[3].value))
+			break
+		case 8:
+			zoomBlurEffect(parseFloat(div[0].value),
+				parseFloat(div[1].value))
+			break
+		case 9:
+			mosaicEffect(parseInt(div[0].value),
+				parseInt(div[1].value))
+	}
 }
 
 
