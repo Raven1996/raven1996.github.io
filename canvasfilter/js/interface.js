@@ -61,7 +61,7 @@ function exportImg(){
 	var save = document.getElementById('saveimage');
 	save.href = image
 	save.type = 'image/png'
-	//save.download = 'IMG.png'
+	save.download = 'IMG.png'
 	save.click()
 }
 
