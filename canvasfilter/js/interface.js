@@ -58,7 +58,11 @@ function scaleCanvas(auto, type){
 function exportImg(){ 
 	// here is the most important part because if you dont replace you will get a DOM 18 exception.
 	var image = canvasB.toDataURL('image/png').replace('image/png', 'image/octet-stream')
-	document.location.href = image
+	var save = document.getElementById('saveimage');
+	save.href = image
+	save.type = 'image/png'
+	//save.download = 'IMG.png'
+	save.click()
 }
 
 function inportImg(){
