@@ -16,6 +16,7 @@ window.onload = function(){
 				canvasB.setAttribute('width', image.width)
 				canvasB.setAttribute('height', image.height)
 				ctxA.drawImage(image, 0, 0)
+				clickIndex(-1)
 				noEffect()
 				scaleCanvas(1)
 			}
