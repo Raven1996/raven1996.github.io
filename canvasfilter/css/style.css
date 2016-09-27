@@ -28,12 +28,13 @@ a{
 
 #titlediv{
 	width: 100%;
-	height: 43px;
-	padding: 3px 0;
+	height: 50px;
+	padding: 3px 8px;
 	border-bottom: 1px solid #808080;
 	background-color: #404040;
 	overflow: hidden;
 	z-index: 10;
+	box-sizing: border-box;
 }
 
 #title{
@@ -41,7 +42,7 @@ a{
 	font-size: 32px;
 	display: inline;
 	color: #e0b942;
-	margin: 0 16px;
+	margin: 0 8px;
 }
 
 #instruction{
@@ -50,13 +51,13 @@ a{
 	color: #c0c0c0;
 }
 
-#export{
+#export, #inport{
 	background-color: #c0c0c0;
 	float: right;
-	margin: 8px 16px 8px 0;
+	margin: 8px 8px auto 0px;
 }
 
-#export:hover{
+#export:hover, #inport:hover{
 	background-color: #e0b942;
 }
 
@@ -102,13 +103,13 @@ a{
 	position: absolute;
 	bottom: 0;
 	left: 8px;
+	padding: 12px 8px 0px 0px;
 	height: 32px;
-	width: 0px;
 }
 
 .sizebuttom{
 	background-color: rgba(255, 255, 255, 0.4);
-	margin: 6px 0px 6px 8px;
+	margin: auto 0px auto 8px;
 	line-height: 12px;
 	z-index: 10;
 }
@@ -163,8 +164,8 @@ input[type="range"]{
 	-moz-appearance: none;
 	appearance: none;
 	background-color: rgba(0, 0, 0, 0);
-	width: 150px;
-	margin: 0px 8px -2px 8px;
+	width: 120px;
+	margin: 0px 4px -2px 4px;
 	height: 12px;
 }
 
@@ -213,6 +214,12 @@ label{
 	display: inline-block;
 }
 
+.num{
+	width: 36px;
+	text-align: center;
+	display: inline-block;
+}
+
 .inactive{
 	display: none;
 }
@@ -228,7 +235,7 @@ select{
 	font-size: 16px;
 	border: solid 1px #808080;
 	width: 150px;
-	margin: 0px 8px 0px 8px;
+	margin: 0px 6px 0px 6px;
 }
 
 select:focus{

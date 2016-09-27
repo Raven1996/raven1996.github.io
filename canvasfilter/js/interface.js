@@ -35,24 +35,8 @@ window.onload = function(){
 				e.preventDefault()
 				e.stopPropagation()
 				holder.className = ''
-				var file = e.dataTransfer.files[0], reader = new FileReader()
-				reader.onload = function(event){
-					img = new Image()
-					img.src = event.target.result
-					img.onload = function(){
-						canvasA.setAttribute('width', this.width)
-						canvasA.setAttribute('height', this.height)
-						canvasB.setAttribute('width', this.width)
-						canvasB.setAttribute('height', this.height)
-						ctxA.clearRect(0, 0, this.width, this.height)
-						ctxA.drawImage(this, 0, 0)
-						delete this
-						clickIndex(-1)
-						noEffect()
-						scaleCanvas(1)
-					}
-				}
-				reader.readAsDataURL(file)
+				var file = e.dataTransfer.files[0]
+				inportFile(file)
 				return false
 			}
 		}
@@ -71,13 +55,37 @@ function scaleCanvas(auto, type){
 }
 
 function exportImg(){ 
-	// here is the most important part because if you dont replace you will get a DOM 18 exception.	 
-	// var image = myCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream;Content-Disposition: attachment;filename=foobar.png');
-	var image = canvasB.toDataURL('image/png').replace('image/png', 'image/octet-stream;filename=foobar.png')
-	var save = document.getElementById('saveimage');
-	save.href = image
-	save.download = 'IMG.png'
-	save.click()
+	// here is the most important part because if you dont replace you will get a DOM 18 exception.
+	var image = canvasB.toDataURL('image/png').replace('image/png', 'image/octet-stream')
+	document.location.href = image
+}
+
+function inportImg(){
+	var input = document.getElementById('inportfile')
+	var file = input.files[0]
+	inportFile(file)
+	input.value=''
+}
+
+function inportFile(file){
+	var reader = new FileReader()
+	reader.onload = function(event){
+		img = new Image()
+		img.src = event.target.result
+		img.onload = function(){
+			canvasA.setAttribute('width', this.width)
+			canvasA.setAttribute('height', this.height)
+			canvasB.setAttribute('width', this.width)
+			canvasB.setAttribute('height', this.height)
+			ctxA.clearRect(0, 0, this.width, this.height)
+			ctxA.drawImage(this, 0, 0)
+			delete this
+			clickIndex(-1)
+			noEffect()
+			scaleCanvas(1)
+		}
+	}
+	reader.readAsDataURL(file)
 }
 
 function clickIndex(index){
@@ -89,6 +97,7 @@ function clickIndex(index){
 				removeClass(applyButtom[i], 'inactive')
 				removeClass(ctrlDiv[i], 'inactive')
 				resetValues(index)
+				updateValues(index)
 				previewCanvas(index)
 			}else{
 				if (!hasClass(applyButtom[i], 'inactive')){
@@ -166,7 +175,49 @@ function resetValues(index){
 			div[0].value="10"
 			div[1].value="0"
 	}
-	
+}
+
+function updateValues(index){
+	var div = document.getElementsByClassName("div"+index)
+	var value = document.getElementsByClassName("value"+index)
+	switch(index){
+		case 0:
+			value[0].innerText=div[0].value
+			value[1].innerText=div[1].value
+			value[2].innerText=div[2].value
+			break
+		case 1:
+			break
+		case 2:
+			value[0].innerText=div[0].value
+			break
+		case 3:
+			value[0].innerText=div[0].value
+			value[1].innerText=div[1].value
+			break
+		case 4:
+			value[0].innerText=div[0].value
+			break
+		case 5:
+			value[0].innerText=div[0].value
+			value[1].innerText=div[1].value
+			break
+		case 6:
+			value[0].innerText=div[0].value
+			value[1].innerText=div[1].value
+			break
+		case 7:
+			value[0].innerText=div[0].value
+			value[1].innerText=div[1].value
+			value[2].innerText=div[2].value
+			break
+		case 8:
+			value[0].innerText=div[0].value
+			value[1].innerText=div[1].value
+			break
+		case 9:
+			value[0].innerText=div[0].value
+	}
 }
 
 function previewCanvas(index){
