@@ -20,7 +20,7 @@ window.onload = function(){
 				noEffect()
 				scaleCanvas(1)
 			}
-			var holder = document.getElementById('drop');
+			var holder = document.getElementById('drop')
 			holder.ondragenter = function(){
 				holder.className = 'hover'
 				return false
@@ -118,16 +118,16 @@ function clickIndex(index){
 	}
 }
 
-function hasClass(obj, cls) {
+function hasClass(obj, cls){
 	return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'))
 }
   
-function addClass(obj, cls) {
-	if (!this.hasClass(obj, cls)) obj.className += ' ' + cls
+function addClass(obj, cls){
+	if(!this.hasClass(obj, cls)) obj.className += ' ' + cls
 }  
   
-function removeClass(obj, cls) {
-	if (hasClass(obj, cls)) {
+function removeClass(obj, cls){
+	if(hasClass(obj, cls)){
 		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
 		obj.className = obj.className.replace(reg, ' ')
 	}
