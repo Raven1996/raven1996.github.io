@@ -148,12 +148,12 @@ function resetValues(index){
 			div[0].value="-0.1"
 			break
 		case 3:
-			div[0].value="5"
+			div[0].value="4"
 			div[1].value="30"
 			div[2].value="0"
 			break
 		case 4:
-			div[0].value="0.05"
+			div[0].value="0.2"
 			break
 		case 5:
 			div[0].value="5"
@@ -175,6 +175,7 @@ function resetValues(index){
 		case 8:
 			div[0].value="0.05"
 			div[1].value="0.25"
+			div[2].value="0"
 			break
 		case 9:
 			div[0].value="10"
@@ -266,7 +267,8 @@ function previewCanvas(index){
 			break
 		case 8:
 			zoomBlurEffect(parseFloat(div[0].value),
-				parseFloat(div[1].value))
+				parseFloat(div[1].value),
+				parseInt(div[2].value))
 			break
 		case 9:
 			mosaicEffect(parseInt(div[0].value),

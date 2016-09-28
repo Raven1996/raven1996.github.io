@@ -198,9 +198,9 @@ function zoomHarrisEffect(strength){  // Harris camera
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	
 	var ratio = []
-	ratio[0] = (2+strength)/2
+	ratio[0] = (10+strength)/10
 	ratio[1] = 1
-	ratio[2] = (2-strength)/2
+	ratio[2] = (10-strength)/10
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -268,41 +268,30 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
-	
-	for(var i = 0; i<fullH+2; i ++)  // 2 pixel larger to make a soft edge
-		for(var j = 0; j<fullW+2; j ++){
-			var p = (i*(fullW+2) + j)<<2
-			pxArr[p+3] = 0
-			pxArr[p+0] = 0
-			pxArr[p+1] = 0
-			pxArr[p+2] = 0
-		}
-	
+
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
-			var p = ((i+1)*(fullW+2) + j+1)<<2
-			var pp = (i*fullW + j)<<2
-			pxArr[p+3] = pxData[pp+3] / 255
-			pxArr[p+0] = pxData[pp+0] / 255 * pxArr[p+3]
-			pxArr[p+1] = pxData[pp+1] / 255 * pxArr[p+3]
-			pxArr[p+2] = pxData[pp+2] / 255 * pxArr[p+3]
+			var p = (i*fullW + j)<<2
+			pxArr[p+3] = pxData[p+3] / 255
+			pxArr[p+0] = pxData[p+0] / 255 * pxArr[p+3]
+			pxArr[p+1] = pxData[p+1] / 255 * pxArr[p+3]
+			pxArr[p+2] = pxData[p+2] / 255 * pxArr[p+3]
 		}
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
 			var percent = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD
-			var ratio = (1-percent)+Math.exp(strength)*(percent)
+			var ratio = strength < 0 ? (1-percent)+Math.exp(strength)*(percent) : (percent)+Math.exp(-strength)*(1-percent)
 			var tmpRGBA = [0, 0, 0, 0]
 			var x = halfH + (i-halfH)*ratio, y = halfW + (j-halfW)*ratio, x_, y_
 			
-			if(x <= fullH && x >= -1 && y <= fullW && y >= -1){
-				x_ = x == fullH ? x-1 : Math.floor(x)
-				y_ = y == fullW ? y-1 : Math.floor(y)
-				for(var k = 0; k < 4; k ++){
-					tmpRGBA[k] += pxArr[(((x_+1)*(fullW+2) + y_+1)<<2)+k] * (x_+1-x)*(y_+1-y) + pxArr[(((x_+1)*(fullW+2) + y_+2)<<2)+k] * (x_+1-x)*(y-y_)
-					tmpRGBA[k] += pxArr[(((x_+2)*(fullW+2) + y_+1)<<2)+k] * (x-x_)*(y_+1-y) + pxArr[(((x_+2)*(fullW+2) + y_+2)<<2)+k] * (x-x_)*(y-y_)
-				}
+			x_ = x == fullH-1 ? x-1 : Math.floor(x)
+			y_ = y == fullW-1 ? y-1 : Math.floor(y)
+			for(var k = 0; k < 4; k ++){
+				tmpRGBA[k] += pxArr[((x_*fullW + y_)<<2)+k] * (x_+1-x)*(y_+1-y) + pxArr[((x_*fullW + y_+1)<<2)+k] * (x_+1-x)*(y-y_)
+				tmpRGBA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k] * (x-x_)*(y_+1-y) + pxArr[(((x_+1)*fullW + y_+1)<<2)+k] * (x-x_)*(y-y_)
 			}
+			
 			var p = (i*fullW + j)<<2
 			pxData[p+0] = tmpRGBA[0]/(tmpRGBA[3]+0.0000000001) * 255
 			pxData[p+1] = tmpRGBA[1]/(tmpRGBA[3]+0.0000000001) * 255
@@ -616,7 +605,7 @@ function motionBlurEffect(length, degree, brightness, mask){
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
-function zoomBlurEffect(strength, brightness){
+function zoomBlurEffect(strength, brightness, type){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
@@ -665,8 +654,11 @@ function zoomBlurEffect(strength, brightness){
 			
 			for(var dk = 0; dk <= blurR_; dk++){
 				var x = i + dk*ratioX, y = j + dk*ratioY
+				var ratio = dk / blurR
+				if(ratio == 0) ratio = 0.5 / blurR  // prevent cracks
 				var wt = blurR - dk  // to make a soft edge
 				if(wt > 1) wt = 1
+				wt *= type == 0 ? 1 : ratio * (1-ratio)
 				if(Math.round(y) == y && Math.round(x) == x){
 					var pp = Math.round(x*fullW + y)<<2
 					totalR += tmpPxArr[pp+0] * wt
