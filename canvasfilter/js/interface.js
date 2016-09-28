@@ -241,7 +241,7 @@ function previewCanvas(index){
 			distortionEffect(parseFloat(div[0].value))
 			break
 		case 3:
-			motionHarrisEffect(parseInt(div[0].value),
+			motionHarrisEffect(parseFloat(div[0].value),
 				parseInt(div[1].value),
 				parseInt(div[2].value))
 			break
