@@ -109,7 +109,7 @@ function hslEffect(degreeH, percentS, percentL){
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
-function motionHarrisEffect(length, degree, mask){  // Harris camera
+function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris shutter
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var pxArr = []
@@ -120,6 +120,11 @@ function motionHarrisEffect(length, degree, mask){  // Harris camera
 	degree -= 90
 	var ratioX = Math.cos(degree/180*Math.PI)
 	var ratioY = Math.sin(degree/180*Math.PI)
+	
+	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
+		centerX = halfW
+		centerY = halfH
+	}
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -135,9 +140,9 @@ function motionHarrisEffect(length, degree, mask){  // Harris camera
 			var motion = [], ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
+				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
 			}
 			motion[0] = -length * ratio
 			motion[1] = 0
@@ -189,13 +194,18 @@ function motionHarrisEffect(length, degree, mask){  // Harris camera
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
-function zoomHarrisEffect(strength){  // Harris camera
+function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var pxArr = []
 	
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
+	
+	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
+		centerX = halfW
+		centerY = halfH
+	}
 	
 	var ratio = []
 	ratio[0] = (10+strength)/10
@@ -216,29 +226,29 @@ function zoomHarrisEffect(strength){  // Harris camera
 			var tmpRGB = [], tmpA = []
 			for(var k = 0; k < 3; k ++){
 				tmpRGB[k] = 0, tmpA[k] = 0
-				var x = halfH + (i-halfH)*ratio[k], y = halfW + (j-halfW)*ratio[k], x_, y_
+				var x = centerY + (i-centerY)*ratio[k], y = centerX + (j-centerX)*ratio[k], x_, y_
 				
 				if(x > fullH-1 || x < 0){
 					var r
 					if(x > fullH-1){
-						r = halfH/(i-halfH)
+						r = (fullH-1-centerY)/(i-centerY)
 						x = fullH-1
 					}else{
-						r = halfH/(halfH-i)
+						r = centerY/(centerY-i)
 						x = 0
 					}
-					y = halfW + (j-halfW)*r
+					y = centerX + (j-centerX)*r
 				}
 				if(y > fullW-1 || y < 0){
 					var r 
 					if(y > fullW-1){
-						r = halfW/(j-halfW)
+						r = (fullW-1-centerX)/(j-centerX)
 						y = fullW-1
 					}else{
-						r = halfW/(halfW-j)
+						r = centerX/(centerX-j)
 						y = 0
 					}
-					x = halfH + (i-halfH)*r
+					x = centerY + (i-centerY)*r
 				}
 				
 				x_ = x == fullH-1 ? x-1 : Math.floor(x)
@@ -302,7 +312,7 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
-function normalBlurEffect(radius, brightness, mask, type){
+function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
@@ -313,6 +323,11 @@ function normalBlurEffect(radius, brightness, mask, type){
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
 	
+	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
+		centerX = halfW
+		centerY = halfH
+	}
+	
 	var power = Math.exp(2.3*brightness)  // 0 ~ 1 remap the value
 	
 	for(var i = 0; i<fullH; i ++)
@@ -321,11 +336,11 @@ function normalBlurEffect(radius, brightness, mask, type){
 			var ratio = 0
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
+				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
 			}
-			rArr[p]= radius * ratio
+			rArr[p]= radius * ratio + 0.5
 			p = p << 2
 			pxArr[p+3] = pxData[p+3] / 255
 			pxArr[p+0] = Math.exp(Math.log(pxData[p+0]/255)*power) * pxArr[p+3]
@@ -341,21 +356,15 @@ function normalBlurEffect(radius, brightness, mask, type){
 			var p = i*fullW + j
 			var blurR = rArr[p]
 			p = p << 2
-			if(blurR <= 1){
-				tmpPxArr[p+0] = pxArr[p+0] / (pxArr[p+3]+0.0000000001)
-				tmpPxArr[p+1] = pxArr[p+1] / (pxArr[p+3]+0.0000000001)
-				tmpPxArr[p+2] = pxArr[p+2] / (pxArr[p+3]+0.0000000001)
-				tmpPxArr[p+3] = pxArr[p+3]
-				continue
-			}
-			var blurR_ = Math.floor(blurR)
+			var blurR_ = Math.round(blurR)
 			var sigma = blurR / 3
 			var sigma2 = 2 * sigma * sigma;
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
 			for(var dx = -blurR_; dx <= blurR_; dx++){
 				var x = i + dx, y = j, wt
 				if(x >= 0 && x < fullH){
-					wt = type == 0 ? blurR - Math.abs(dx) : Math.exp(-(dx * dx) / sigma2) // the first is much faster
+					wt = type == 0 ? blurR - Math.abs(dx) + 0.25 : Math.exp(-(dx * dx) / sigma2) // the first is much faster
+					if(wt < 0) wt = 0
 					var pp = (x*fullW + y)<<2
 					totalR += pxArr[pp+0] * wt
 					totalG += pxArr[pp+1] * wt
@@ -377,21 +386,15 @@ function normalBlurEffect(radius, brightness, mask, type){
 			var p = i*fullW + j
 			var blurR = rArr[p]
 			p = p << 2
-			if(blurR <= 1){
-				pxData[p+0] = Math.exp(Math.log(tmpPxArr[p+0]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+1] = Math.exp(Math.log(tmpPxArr[p+1]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+2] = Math.exp(Math.log(tmpPxArr[p+2]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+3] = tmpPxArr[p+3] * 255
-				continue
-			}
-			var blurR_ = Math.floor(blurR)
+			var blurR_ = Math.round(blurR)
 			var sigma = blurR / 3
 			var sigma2 = 2 * sigma * sigma;
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
 			for(var dy = -blurR_; dy <= blurR_; dy++){
 				var x = i, y = j + dy, wt
 				if(y >= 0 && y < fullW){
-					wt = type == 0 ? 1 - Math.abs(dy)/blurR : Math.exp(-(dy * dy) / sigma2) // the first is much faster
+					wt = type == 0 ? blurR - Math.abs(dy) + 0.25: Math.exp(-(dy * dy) / sigma2) // the first is much faster
+					if(wt < 0) wt = 0
 					var pp = (x*fullW + y)<<2
 					totalR += tmpPxArr[pp+0] * wt
 					totalG += tmpPxArr[pp+1] * wt
@@ -409,7 +412,7 @@ function normalBlurEffect(radius, brightness, mask, type){
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
-function lenBlurEffect(radius, brightness, mask){
+function lenBlurEffect(radius, brightness, mask, centerX, centerY){
 
 /*
 	var b=new ArrayBuffer(4)
@@ -434,6 +437,11 @@ function lenBlurEffect(radius, brightness, mask){
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
 	
+	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
+		centerX = halfW
+		centerY = halfH
+	}
+	
 	var power = Math.exp(2.3*brightness)  // 0 ~ 1 remap the value
 	
 	for(var i = 0; i<fullH; i ++)
@@ -452,22 +460,14 @@ function lenBlurEffect(radius, brightness, mask){
 			var ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
+				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
 			}
-			var blurR = radius * ratio
+			var blurR = radius * ratio + 1
 			var p = (i*fullW + j)<<2
-			if(blurR <= 0.5){
-				pxData[p+0] = Math.exp(Math.log(tmpPxArr[p+0]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+1] = Math.exp(Math.log(tmpPxArr[p+1]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+2] = Math.exp(Math.log(tmpPxArr[p+2]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+3] = tmpPxArr[p+3] * 255
-				continue
-			}
-			var blurR_ = Math.round(blurR)
+			var blurR_ = Math.floor(blurR)
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
-			blurR += 0.5
 			for(var dx = -blurR_; dx <= blurR_; dx++)
 				for(var dy = -blurR_; dy <= blurR_; dy++){
 					var wt = blurR - Math.sqrt(dx*dx + dy*dy)
@@ -502,7 +502,7 @@ function lenBlurEffect(radius, brightness, mask){
 	var dy = Math.sin(theta)*r
 */
 
-function motionBlurEffect(length, degree, brightness, mask){
+function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
@@ -510,6 +510,11 @@ function motionBlurEffect(length, degree, brightness, mask){
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
+	
+	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
+		centerX = halfW
+		centerY = halfH
+	}
 	
 	degree %= 180
 	if(degree < 0) degree += 180
@@ -543,24 +548,15 @@ function motionBlurEffect(length, degree, brightness, mask){
 			var ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-halfH)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-halfW)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
+				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
 			}
 			var blurR = length * ratio * ratioR
 			var p = (i*fullW + j)<<2
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
-			blurR = Math.abs(blurR)
-			if(blurR < 0.5){
-				pxData[p+0] = Math.exp(Math.log(tmpPxArr[p+0]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+1] = Math.exp(Math.log(tmpPxArr[p+1]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+2] = Math.exp(Math.log(tmpPxArr[p+2]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
-				pxData[p+3] = tmpPxArr[p+3] * 255
-				continue
-			}
-			var blurR_ = Math.round(blurR)
-			blurR += 0.5
-			
+			blurR = Math.abs(blurR) + 1
+			var blurR_ = Math.floor(blurR)
 			for(var dk = -blurR_; dk <= blurR_; dk++){
 				var x = i + dk*ratioX, y = j + dk*ratioY
 				if(x >= 0 && x <= fullH-1 && y >= 0 && y <= fullW-1){
@@ -605,13 +601,18 @@ function motionBlurEffect(length, degree, brightness, mask){
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
-function zoomBlurEffect(strength, brightness, type){
+function zoomBlurEffect(strength, brightness, type, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
 
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
+	
+	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
+		centerX = halfW
+		centerY = halfH
+	}
 	
 	var power = Math.exp(2.3*brightness)  // 0 ~ 1 remap the value
 	
@@ -628,10 +629,10 @@ function zoomBlurEffect(strength, brightness, type){
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
-			var zoomX = (halfH-i) * strength, zoomY = (halfW-j) * strength
+			var zoomX = (centerY-i) * strength, zoomY = (centerX-j) * strength
 			var zoomX_ = Math.abs(zoomX), zoomY_ = Math.abs(zoomY)
 			var p = (i*fullW + j)<<2
-			if(zoomX_<=0.5 && zoomY_<=0.5){
+			if(zoomX_==0 && zoomY_==0){
 				pxData[p+0] = Math.exp(Math.log(tmpPxArr[p+0]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
 				pxData[p+1] = Math.exp(Math.log(tmpPxArr[p+1]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
 				pxData[p+2] = Math.exp(Math.log(tmpPxArr[p+2]/(tmpPxArr[p+3]+0.0000000001)) * power) * 255
@@ -640,17 +641,16 @@ function zoomBlurEffect(strength, brightness, type){
 			}
 			var blurR, ratioX, ratioY
 			if(zoomX_ >= zoomY_){
-				blurR = zoomX_
+				blurR = zoomX_ + 1
 				ratioX = zoomX > 0 ? 1 : -1
 				ratioY = zoomY / zoomX_
 			}else{
-				blurR = zoomY_
+				blurR = zoomY_ + 1
 				ratioX = zoomX / zoomY_
 				ratioY = zoomY > 0 ? 1 : -1
 			}
-			var blurR_ = Math.round(blurR)
+			var blurR_ = Math.floor(blurR)
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
-			blurR += 0.5
 			
 			for(var dk = 0; dk <= blurR_; dk++){
 				var x = i + dk*ratioX, y = j + dk*ratioY
