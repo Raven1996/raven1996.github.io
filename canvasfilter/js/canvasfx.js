@@ -363,7 +363,7 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 			for(var dx = -blurR_; dx <= blurR_; dx++){
 				var x = i + dx, y = j, wt
 				if(x >= 0 && x < fullH){
-					wt = type == 0 ? blurR - Math.abs(dx) + 0.25 : Math.exp(-(dx * dx) / sigma2) // the first is much faster
+					wt = type == 0 ? blurR - Math.abs(dx) + 0.5 : Math.exp(-(dx * dx) / sigma2) // the first is much faster
 					if(wt < 0) wt = 0
 					var pp = (x*fullW + y)<<2
 					totalR += pxArr[pp+0] * wt

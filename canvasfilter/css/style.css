@@ -51,13 +51,13 @@ a{
 	color: #c0c0c0;
 }
 
-#export, #inport{
+#export, #import{
 	background-color: #c0c0c0;
 	float: right;
 	margin: 8px 8px auto 0px;
 }
 
-#export:hover, #inport:hover{
+#export:hover, #import:hover{
 	background-color: #e0b942;
 }
 

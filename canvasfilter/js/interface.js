@@ -37,7 +37,7 @@ window.onload = function(){
 				e.stopPropagation()
 				holder.className = ''
 				var file = e.dataTransfer.files[0]
-				inportFile(file)
+				importFile(file)
 				return false
 			}
 		}
@@ -65,14 +65,14 @@ function exportImg(){
 	save.click()
 }
 
-function inportImg(){
-	var input = document.getElementById('inportfile')
+function importImg(){
+	var input = document.getElementById('importfile')
 	var file = input.files[0]
-	inportFile(file)
+	importFile(file)
 	input.value=''
 }
 
-function inportFile(file){
+function importFile(file){
 	var reader = new FileReader()
 	reader.onload = function(event){
 		img = new Image()
