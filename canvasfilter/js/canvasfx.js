@@ -1,3 +1,5 @@
+"use strict";
+
 var canvasA , canvasB
 var ctxA , ctxB
 
@@ -28,59 +30,55 @@ function greyEffect(type){
 		var r = pxData[(i<<2)+0]
 		var g = pxData[(i<<2)+1]
 		var b = pxData[(i<<2)+2]
-
-		var grey
-		grey = type == 0 ? (r*38 + g*75 + b*15) >> 7 : (r + g + b) /3
-
-		pxData[(i<<2)+0] = grey
-		pxData[(i<<2)+1] = grey
-		pxData[(i<<2)+2] = grey
+		pxData[(i<<2)+0] = pxData[(i<<2)+1] = pxData[(i<<2)+2] = type == 0 ? (r*38 + g*75 + b*15) >> 7 : (r + g + b) /3
 	}
 
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
+function hue2rgb(p, q, t){
+	t -= Math.floor(t)
+	if(t < 1/6) return p + (q - p) * 6 * t
+	if(t < 1/2) return q
+	if(t < 2/3) return p + (q - p) * (2/3 - t) * 6
+	return p;
+}
+
+function hslToRgb(h, s, l){
+	var r, g, b
+	if(s == 0){
+		r = g = b = l  // achromatic
+	}else{
+		if(s > 1) s = 1
+		var q = l < 0.5 ? l * (1 + s) : l + s - l * s
+		var p = 2 * l - q
+		r = hue2rgb(p, q, h + 1/3)
+		g = hue2rgb(p, q, h)
+		b = hue2rgb(p, q, h - 1/3)
+	}
+	return [r*255, g*255, b*255]
+}
+
+function rgbToHsl(r, g, b){
+	r /= 255, g /= 255, b /= 255
+	var max = Math.max(r, g, b), min = Math.min(r, g, b)
+	var h, s, l = (max+min) / 2
+	if(max == min){
+		h = s = 0  // achromatic
+	}else{
+		var d = max - min
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+		switch(max){
+			case r: h = (g - b) / d + (g < b ? 6 : 0); break
+			case g: h = (b - r) / d + 2; break
+			case b: h = (r - g) / d + 4; break
+		}
+		h /= 6
+	}
+	return [h, s, l]
+}
+
 function hslEffect(degreeH, percentS, percentL){
-	function hslToRgb(h, s, l){
-		var r, g, b
-		if(s == 0){
-			r = g = b = l  // achromatic
-		}else{
-			function hue2rgb(p, q, t){
-				t -= Math.floor(t)
-				if(t < 1/6) return p + (q - p) * 6 * t
-				if(t < 1/2) return q
-				if(t < 2/3) return p + (q - p) * (2/3 - t) * 6
-				return p;
-			}
-			var q = l < 0.5 ? l * (1 + s) : l + s - l * s
-			var p = 2 * l - q
-			r = hue2rgb(p, q, h + 1/3)
-			g = hue2rgb(p, q, h)
-			b = hue2rgb(p, q, h - 1/3)
-		}
-		return [Math.round(r*255), Math.round(g*255), Math.round(b*255)]
-	}
-	
-	function rgbToHsl(r, g, b){
-		r /= 255, g /= 255, b /= 255
-		var max = Math.max(r, g, b), min = Math.min(r, g, b)
-		var h, s, l = (max+min) / 2
-		if(max == min){
-			h = s = 0  // achromatic
-		}else{
-			var d = max - min
-			s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-			switch(max){
-				case r: h = (g - b) / d + (g < b ? 6 : 0); break
-				case g: h = (b - r) / d + 2; break
-				case b: h = (r - g) / d + 4; break
-			}
-			h /= 6
-		}
-		return [h, s, l]
-	}
-	
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var fullH = canvasB.height, fullW = canvasB.width
@@ -93,17 +91,11 @@ function hslEffect(degreeH, percentS, percentL){
 		var r = pxData[(i<<2)+0]
 		var g = pxData[(i<<2)+1]
 		var b = pxData[(i<<2)+2]
-		var hslArr = rgbToHsl(r, g, b)
-		hslArr[0] += degreeH
-		hslArr[0] -= Math.floor(hslArr[0])
-		hslArr[1] *= ratio
-		if(hslArr[1] > 1) hslArr[1] = 1
-		hslArr[2] = Math.exp(Math.log(hslArr[2]) * power)
-		var rgbArr = hslToRgb(hslArr[0], hslArr[1], hslArr[2])
-
-		pxData[(i<<2)+0] = rgbArr[0]
-		pxData[(i<<2)+1] = rgbArr[1]
-		pxData[(i<<2)+2] = rgbArr[2]
+		var arr = rgbToHsl(r, g, b)
+		arr = hslToRgb(arr[0] + degreeH, arr[1] *= ratio, Math.exp(Math.log(arr[2]) * power))
+		pxData[(i<<2)+0] = arr[0]
+		pxData[(i<<2)+1] = arr[1]
+		pxData[(i<<2)+2] = arr[2]
 	}
 
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
@@ -120,7 +112,6 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 	degree -= 90
 	var ratioX = Math.cos(degree/180*Math.PI)
 	var ratioY = Math.sin(degree/180*Math.PI)
-	
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -412,23 +403,23 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
 
-function lenBlurEffect(radius, brightness, mask, centerX, centerY){
-
 /*
-	var b=new ArrayBuffer(4)
-	var d=new DataView(b, 0)
-	function fastSqrt(num){  // https://en.wikipedia.org/wiki/Fast_inverse_square_root
-		d.setFloat32(0, num)
-		var i_ = d.getInt32(0)
-		i_ = 0x5f375a86 - (i_>>1)
-		d.setInt32(0, i_)
-		var y_ = d.getFloat32(0)
-		y_ *= (1.5 - 0.5*num*y_*y_)
-		return y_*num
-	}
-	// actually very slow
+var b=new ArrayBuffer(4)
+var d=new DataView(b, 0)
+function fastSqrt(num){  // https://en.wikipedia.org/wiki/Fast_inverse_square_root
+	d.setFloat32(0, num)
+	var i_ = d.getInt32(0)
+	i_ = 0x5f375a86 - (i_>>1)
+	d.setInt32(0, i_)
+	var y_ = d.getFloat32(0)
+	y_ *= (1.5 - 0.5*num*y_*y_)
+	return y_*num
+}
+// actually very slow
 */
 
+function lenBlurEffect(radius, brightness, mask, centerX, centerY){
+	
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
@@ -466,25 +457,33 @@ function lenBlurEffect(radius, brightness, mask, centerX, centerY){
 			}
 			var blurR = radius * ratio + 1
 			var p = (i*fullW + j)<<2
-			var blurR_ = Math.floor(blurR)
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
-			for(var dx = -blurR_; dx <= blurR_; dx++)
-				for(var dy = -blurR_; dy <= blurR_; dy++){
-					var wt = blurR - Math.sqrt(dx*dx + dy*dy)
-					//var wt = blurR - fastSqrt(dx*dx + dy*dy)
-					if(wt > 0){
-						var x = i + dx, y = j + dy
-						if(x >= 0 && x < fullH && y >= 0 && y < fullW){
-							if(wt > 1) wt = 1  // to make a soft edge
-							var pp = (x*fullW + y)<<2  
-							totalR += tmpPxArr[pp+0] * wt
-							totalG += tmpPxArr[pp+1] * wt
-							totalB += tmpPxArr[pp+2] * wt
-							totalA += tmpPxArr[pp+3] * wt
-							totalW += wt
+			var blurR_x = Math.floor(blurR)
+			for(var dx = -blurR_x; dx <= blurR_x; dx++){
+				var blurR_y = Math.floor(Math.sqrt(blurR*blurR - dx*dx))
+				var weight1 = -1
+				for(var dy = -blurR_y; dy <= blurR_y; dy++){
+					var wt = 1
+					if(Math.abs(dy) > weight1){
+						wt = blurR - Math.sqrt(dx*dx + dy*dy)
+						if(wt >= 1){
+							wt = 1
+							weight1 = Math.abs(dy)
 						}
 					}
+					//var wt = blurR - fastSqrt(dx*dx + dy*dy)
+					var x = i + dx, y = j + dy
+					if(x >= 0 && x < fullH && y >= 0 && y < fullW){
+						if(wt > 1) wt = 1  // to make a soft edge
+						var pp = (x*fullW + y)<<2  
+						totalR += tmpPxArr[pp+0] * wt
+						totalG += tmpPxArr[pp+1] * wt
+						totalB += tmpPxArr[pp+2] * wt
+						totalA += tmpPxArr[pp+3] * wt
+						totalW += wt
+					}
 				}
+			}
 			pxData[p+0] = Math.exp(Math.log(totalR/(totalA+0.0000000001)) * power) * 255
 			pxData[p+1] = Math.exp(Math.log(totalG/(totalA+0.0000000001)) * power) * 255
 			pxData[p+2] = Math.exp(Math.log(totalB/(totalA+0.0000000001)) * power) * 255
