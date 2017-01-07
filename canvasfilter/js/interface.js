@@ -1,9 +1,12 @@
+var scaleType = 1  // 0:100% 1:auto
+
 window.onresize = function(){
-	scaleCanvas(1)
+	scaleCanvas()
 }
 
 function setScaleType(type){
-	scaleCanvas(0, type)
+	scaleType = type
+	scaleCanvas()
 }
 
 window.onload = function(){
@@ -18,7 +21,7 @@ window.onload = function(){
 				ctxA.drawImage(image, 0, 0)
 				clickIndex(-1)
 				noEffect()
-				scaleCanvas(1)
+				setScaleType(1)
 			}
 			var holder = document.getElementById('drop')
 			holder.ondragenter = function(){
@@ -42,13 +45,14 @@ window.onload = function(){
 			}
 		}
 
-function scaleCanvas(auto, type){
+function scaleCanvas(){
 	var span = document.getElementById('imgspan')
 	var width = span.offsetWidth - 16
 	var height = span.offsetHeight - 16
 	var ratio = 0
+	var type = scaleType
 	height/canvasB.height > width/canvasB.width ? ratio = width/canvasB.width : ratio = height/canvasB.height
-	if(auto == 1){
+	if(scaleType == 1){
 		ratio > 1 ? type = 0 : type = 1
 	}
 	type == 0 ? canvasB.style.width = canvasB.width+'px' : canvasB.style.width = canvasB.width*ratio+'px'
@@ -87,7 +91,7 @@ function importFile(file){
 			delete this
 			clickIndex(-1)
 			noEffect()
-			scaleCanvas(1)
+			setScaleType(1)
 		}
 	}
 	reader.readAsDataURL(file)

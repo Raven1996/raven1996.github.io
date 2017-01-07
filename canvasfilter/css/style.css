@@ -97,6 +97,7 @@ a{
 	float: right;
 	border-left: 1px solid #404040;
 	overflow: hidden;
+	box-sizing: border-box;
 }
 
 #size{
