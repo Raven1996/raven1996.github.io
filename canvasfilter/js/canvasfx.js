@@ -1,5 +1,3 @@
-"use strict";
-
 var canvasA , canvasB
 var ctxA , ctxB
 
@@ -189,10 +187,8 @@ function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var pxArr = []
-	
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
-	
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -265,7 +261,6 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var pxArr = []
-	
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
@@ -306,14 +301,10 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
-	var tmpPxArr = []
-	var pxArr = []
-	var rArr=[]
-
+	var tmpPxArr = [], pxArr = [], rArr=[]
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
-	
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -419,15 +410,12 @@ function fastSqrt(num){  // https://en.wikipedia.org/wiki/Fast_inverse_square_ro
 */
 
 function lenBlurEffect(radius, brightness, mask, centerX, centerY){
-	
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
-
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
-	
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -505,11 +493,9 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
-
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
 	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
-	
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -518,7 +504,7 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 	degree %= 180
 	if(degree < 0) degree += 180
 	degree -= 90 
-	
+	var ratioR, ratioX, ratioY
 	if(degree <= 45 && degree >= -45) {
 		ratioR = Math.cos(Math.PI*degree / 180)
 		ratioX = 1
@@ -530,7 +516,7 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 	}
 	
 	var power = Math.exp(2.3*brightness)  // 0 ~ 1 remap the value
-	
+
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
 			var p = (i*fullW + j)<<2
@@ -604,10 +590,8 @@ function zoomBlurEffect(strength, brightness, type, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
-
 	var fullH = canvasB.height, fullW = canvasB.width
 	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
-	
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -700,7 +684,6 @@ function mosaicEffect(size, type){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height)
 	var pxData = imgData.data
 	var tmpPxArr = []
-	
 	var fullH = canvasB.height, fullW = canvasB.width
 	var beginI, endI, beginJ, endJ
 	
@@ -731,7 +714,6 @@ function mosaicEffect(size, type){
 		break 
 	}
 	
-	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
 			var p = (i*fullW + j)<<2
@@ -758,18 +740,14 @@ function mosaicEffect(size, type){
 						totalW ++
 					}
 				}
-
 			var resR = Math.round(totalR / (totalA+0.0000000001))
 			var resG = Math.round(totalG / (totalA+0.0000000001))
 			var resB = Math.round(totalB / (totalA+0.0000000001))
 			var resA = Math.round(totalA / totalW * 255)
-
 			for(var dx = 0; dx < size; dx ++)
 				for(var dy = 0; dy < size; dy ++){
-
 					var x = i + dx
 					var y = j + dy
-
 					if(x >= 0 && x < fullH && y >= 0 && y < fullW){
 						var p = (x*fullW + y)<<2
 						pxData[p+0] = resR
@@ -779,6 +757,6 @@ function mosaicEffect(size, type){
 					}
 				}
 		}
-		
+	
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH)
 }
