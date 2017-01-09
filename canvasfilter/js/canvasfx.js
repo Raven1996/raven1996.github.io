@@ -37,7 +37,7 @@ function greyEffect(type){
 function hue2rgb(p, q, t){
 	t -= Math.floor(t)
 	if(t < 1/6) return p + (q - p) * 6 * t
-	if(t < 1/2) return q
+	if(t < 0.5) return q
 	if(t < 2/3) return p + (q - p) * (2/3 - t) * 6
 	return p;
 }
@@ -60,7 +60,7 @@ function hslToRgb(h, s, l){
 function rgbToHsl(r, g, b){
 	r /= 255, g /= 255, b /= 255
 	var max = Math.max(r, g, b), min = Math.min(r, g, b)
-	var h, s, l = (max+min) / 2
+	var h, s, l = (max+min) * 0.5
 	if(max == min){
 		h = s = 0  // achromatic
 	}else{
@@ -82,8 +82,8 @@ function hslEffect(degreeH, percentS, percentL){
 	var fullH = canvasB.height, fullW = canvasB.width
 	var fullS = fullH*fullW
 	degreeH /= 360
-	var ratio = (100 + percentS)/100
-	var power = Math.exp(-percentL/100) 
+	var ratio = (100 + percentS) * 0.01
+	var power = Math.exp(-percentL * 0.01) 
 	
 	for(var i = 0; i < fullS; i ++){
 		var r = pxData[(i<<2)+0]
@@ -105,11 +105,11 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 	var pxArr = []
 	
 	var fullH = canvasB.height, fullW = canvasB.width
-	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
-	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5
+	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW
+	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH)
 	degree -= 90
-	var ratioX = Math.cos(degree/180*Math.PI)
-	var ratioY = Math.sin(degree/180*Math.PI)
+	var ratioX = Math.cos(degree/180*Math.PI), ratioY = Math.sin(degree/180*Math.PI)
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -129,9 +129,9 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 			var motion = [], ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))*halfD_Re; break  // round
+				case 2 : ratio = Math.abs(i-centerY)*halfH_Re; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)*halfW_Re  // vertical
 			}
 			motion[0] = -length * ratio
 			motion[1] = 0
@@ -139,7 +139,7 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 			var tmpRGB = [], tmpA = []
 			for(var k = 0; k < 3; k ++){
 				tmpRGB[k] = 0, tmpA[k] = 0
-				var x = i + motion[k]*ratioX, y = j + motion[k]*ratioY, x_, y_
+				var x = i + motion[k]*ratioX, y = j + motion[k]*ratioY
 				
 				if(x > fullH-1 || x < 0){
 					var m
@@ -164,13 +164,14 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 					x = i + m*ratioX
 				}
 				
-				x_ = x == fullH-1 ? x-1 : Math.floor(x)
-				y_ = y == fullW-1 ? y-1 : Math.floor(y)
+				var x_ = x == fullH-1 ? x-1 : Math.floor(x)
+				var y_ = y == fullW-1 ? y-1 : Math.floor(y)
+				var kx0=x-x_, kx1=1-kx0, ky0=y-y_, ky1=1-ky0
 
-				tmpRGB[k] += pxArr[((x_*fullW + y_)<<2)+k] * (x_+1-x)*(y_+1-y) + pxArr[((x_*fullW + y_+1)<<2)+k] * (x_+1-x)*(y-y_)
-				tmpRGB[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k] * (x-x_)*(y_+1-y) + pxArr[(((x_+1)*fullW + y_+1)<<2)+k] * (x-x_)*(y-y_)
-				tmpA[k] += pxArr[((x_*fullW + y_)<<2)+3] * (x_+1-x)*(y_+1-y) + pxArr[((x_*fullW + y_+1)<<2)+3] * (x_+1-x)*(y-y_)
-				tmpA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+3] * (x-x_)*(y_+1-y) + pxArr[(((x_+1)*fullW + y_+1)<<2)+3] * (x-x_)*(y-y_)
+				tmpRGB[k] += pxArr[((x_*fullW + y_)<<2)+k]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)+k]*kx1*ky0
+				tmpRGB[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)+k]*kx0*ky0
+				tmpA[k] += pxArr[((x_*fullW + y_)<<2)+3]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)+3]*kx1*ky0
+				tmpA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+3]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)+3]*kx0*ky0
 			}
 			
 			var p = (i*fullW + j)<<2
@@ -188,16 +189,16 @@ function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 	var pxData = imgData.data
 	var pxArr = []
 	var fullH = canvasB.height, fullW = canvasB.width
-	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
 	}
 	
 	var ratio = []
-	ratio[0] = (10+strength)/10
+	ratio[0] = (10+strength) * 0.1
 	ratio[1] = 1
-	ratio[2] = (10-strength)/10
+	ratio[2] = (10-strength) * 0.1
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -213,7 +214,7 @@ function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 			var tmpRGB = [], tmpA = []
 			for(var k = 0; k < 3; k ++){
 				tmpRGB[k] = 0, tmpA[k] = 0
-				var x = centerY + (i-centerY)*ratio[k], y = centerX + (j-centerX)*ratio[k], x_, y_
+				var x = centerY + (i-centerY)*ratio[k], y = centerX + (j-centerX)*ratio[k]
 				
 				if(x > fullH-1 || x < 0){
 					var r
@@ -238,13 +239,14 @@ function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 					x = centerY + (i-centerY)*r
 				}
 				
-				x_ = x == fullH-1 ? x-1 : Math.floor(x)
-				y_ = y == fullW-1 ? y-1 : Math.floor(y)
-				
-				tmpRGB[k] += pxArr[((x_*fullW + y_)<<2)+k] * (x_+1-x)*(y_+1-y) + pxArr[((x_*fullW + y_+1)<<2)+k] * (x_+1-x)*(y-y_)
-				tmpRGB[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k] * (x-x_)*(y_+1-y) + pxArr[(((x_+1)*fullW + y_+1)<<2)+k] * (x-x_)*(y-y_)
-				tmpA[k] += pxArr[((x_*fullW + y_)<<2)+3] * (x_+1-x)*(y_+1-y) + pxArr[((x_*fullW + y_+1)<<2)+3] * (x_+1-x)*(y-y_)
-				tmpA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+3] * (x-x_)*(y_+1-y) + pxArr[(((x_+1)*fullW + y_+1)<<2)+3] * (x-x_)*(y-y_)
+				var x_ = x == fullH-1 ? x-1 : Math.floor(x)
+				var y_ = y == fullW-1 ? y-1 : Math.floor(y)
+				var kx0=x-x_, kx1=1-kx0, ky0=y-y_, ky1=1-ky0
+
+				tmpRGB[k] += pxArr[((x_*fullW + y_)<<2)+k]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)+k]*kx1*ky0
+				tmpRGB[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)+k]*kx0*ky0
+				tmpA[k] += pxArr[((x_*fullW + y_)<<2)+3]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)+3]*kx1*ky0
+				tmpA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+3]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)+3]*kx0*ky0
 			}
 			
 			var p = (i*fullW + j)<<2
@@ -262,8 +264,8 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 	var pxData = imgData.data
 	var pxArr = []
 	var fullH = canvasB.height, fullW = canvasB.width
-	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
-	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5
+	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH)
 
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -276,16 +278,17 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
-			var percent = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))/halfD
+			var percent = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))*halfD_Re
 			var ratio = strength < 0 ? (1-percent)+Math.exp(strength)*(percent) : (percent)+Math.exp(-strength)*(1-percent)
 			var tmpRGBA = [0, 0, 0, 0]
-			var x = halfH + (i-halfH)*ratio, y = halfW + (j-halfW)*ratio, x_, y_
+			var x = halfH + (i-halfH)*ratio, y = halfW + (j-halfW)*ratio
 			
-			x_ = x == fullH-1 ? x-1 : Math.floor(x)
-			y_ = y == fullW-1 ? y-1 : Math.floor(y)
+			var x_ = x == fullH-1 ? x-1 : Math.floor(x)
+			var y_ = y == fullW-1 ? y-1 : Math.floor(y)
+			var kx0=x-x_, kx1=1-kx0, ky0=y-y_, ky1=1-ky0
 			for(var k = 0; k < 4; k ++){
-				tmpRGBA[k] += pxArr[((x_*fullW + y_)<<2)+k] * (x_+1-x)*(y_+1-y) + pxArr[((x_*fullW + y_+1)<<2)+k] * (x_+1-x)*(y-y_)
-				tmpRGBA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k] * (x-x_)*(y_+1-y) + pxArr[(((x_+1)*fullW + y_+1)<<2)+k] * (x-x_)*(y-y_)
+				tmpRGBA[k] += pxArr[((x_*fullW + y_)<<2)+k]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)+k]*kx1*ky0
+				tmpRGBA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)+k]*kx0*ky0
 			}
 			
 			var p = (i*fullW + j)<<2
@@ -303,8 +306,9 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 	var pxData = imgData.data
 	var tmpPxArr = [], pxArr = [], rArr=[]
 	var fullH = canvasB.height, fullW = canvasB.width
-	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
-	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5
+	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW
+	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH)
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -318,9 +322,9 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 			var ratio = 0
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))*halfD_Re; break  // round
+				case 2 : ratio = Math.abs(i-centerY)*halfH_Re; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)*halfW_Re  // vertical
 			}
 			rArr[p]= radius * ratio + 0.5
 			p = p << 2
@@ -339,13 +343,13 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 			var blurR = rArr[p]
 			p = p << 2
 			var blurR_ = Math.round(blurR)
-			var sigma = blurR / 3
-			var sigma2 = 2 * sigma * sigma;
+			var sigma = blurR * 0.333
+			var sigma2 = 0.5 / (sigma * sigma);
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
 			for(var dx = -blurR_; dx <= blurR_; dx++){
 				var x = i + dx, y = j, wt
 				if(x >= 0 && x < fullH){
-					wt = type == 0 ? blurR - Math.abs(dx) + 0.5 : Math.exp(-(dx * dx) / sigma2) // the first is much faster
+					wt = type == 0 ? blurR - Math.abs(dx) + 0.5 : Math.exp(-dx * dx * sigma2) // the first is much faster
 					if(wt < 0) wt = 0
 					var pp = (x*fullW + y)<<2
 					totalR += pxArr[pp+0] * wt
@@ -369,13 +373,13 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 			var blurR = rArr[p]
 			p = p << 2
 			var blurR_ = Math.round(blurR)
-			var sigma = blurR / 3
-			var sigma2 = 2 * sigma * sigma;
+			var sigma = blurR * 0.333
+			var sigma2 = 0.5 / (sigma * sigma);
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0
 			for(var dy = -blurR_; dy <= blurR_; dy++){
 				var x = i, y = j + dy, wt
 				if(y >= 0 && y < fullW){
-					wt = type == 0 ? blurR - Math.abs(dy) + 0.25: Math.exp(-(dy * dy) / sigma2) // the first is much faster
+					wt = type == 0 ? blurR - Math.abs(dy) + 0.25: Math.exp(-dy * dy * sigma2) // the first is much faster
 					if(wt < 0) wt = 0
 					var pp = (x*fullW + y)<<2
 					totalR += tmpPxArr[pp+0] * wt
@@ -414,8 +418,9 @@ function lenBlurEffect(radius, brightness, mask, centerX, centerY){
 	var pxData = imgData.data
 	var tmpPxArr = []
 	var fullH = canvasB.height, fullW = canvasB.width
-	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
-	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5
+	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW
+	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH)
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -439,9 +444,9 @@ function lenBlurEffect(radius, brightness, mask, centerX, centerY){
 			var ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))*halfD_Re; break  // round
+				case 2 : ratio = Math.abs(i-centerY)*halfH_Re; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)*halfW_Re  // vertical
 			}
 			var blurR = radius * ratio + 1
 			var p = (i*fullW + j)<<2
@@ -494,8 +499,9 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 	var pxData = imgData.data
 	var tmpPxArr = []
 	var fullH = canvasB.height, fullW = canvasB.width
-	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
-	var halfD = Math.sqrt(halfW*halfW + halfH*halfH)
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5
+	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW
+	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH)
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
@@ -533,9 +539,9 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 			var ratio
 			switch(mask){
 				case 0 : ratio = 1; break  // none
-				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))/halfD; break  // round
-				case 2 : ratio = Math.abs(i-centerY)/halfH; break  // horizontal
-				case 3 : ratio = Math.abs(j-centerX)/halfW  // vertical
+				case 1 : ratio = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))*halfD_Re; break  // round
+				case 2 : ratio = Math.abs(i-centerY)*halfH_Re; break  // horizontal
+				case 3 : ratio = Math.abs(j-centerX)*halfW_Re  // vertical
 			}
 			var blurR = length * ratio * ratioR
 			var p = (i*fullW + j)<<2
@@ -591,7 +597,7 @@ function zoomBlurEffect(strength, brightness, type, centerX, centerY){
 	var pxData = imgData.data
 	var tmpPxArr = []
 	var fullH = canvasB.height, fullW = canvasB.width
-	var halfH = (fullH-1)/2, halfW = (fullW-1)/2
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5
 	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
 		centerX = halfW
 		centerY = halfH
