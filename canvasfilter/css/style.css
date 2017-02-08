@@ -208,8 +208,28 @@ input[type=range]:focus{
     outline: none;
 }
 
+input[type=text]
+{
+	outline: none;
+	color: #808080;
+	background-color: #404040;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	border: solid 1px #808080;
+	width: 56px;
+	padding: 1px 4px;
+	margin: 0px 24px 0px 0px;
+}
+
 label{
 	width: 72px;
+	line-height: 16px;
+	padding: 4px 0px;
+	display: inline-block;
+}
+
+.center{
+	width: 24px;
 	line-height: 16px;
 	padding: 4px 0px;
 	display: inline-block;

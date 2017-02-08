@@ -110,10 +110,10 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH);
 	degree -= 90;
 	var ratioX = Math.cos(degree/180*Math.PI), ratioY = Math.sin(degree/180*Math.PI);
-	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
-		centerX = halfW;
-		centerY = halfH;
-	}
+	if(typeof(centerX) == "undefined") centerX = halfW;
+	else centerX *= fullW - 1;
+	if(typeof(centerY) == "undefined") centerY = halfH;
+	else centerY *= fullH - 1;
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -190,10 +190,10 @@ function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 	var pxArr = [];
 	var fullH = canvasB.height, fullW = canvasB.width;
 	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
-	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
-		centerX = halfW;
-		centerY = halfH;
-	}
+	if(typeof(centerX) == "undefined") centerX = halfW;
+	else centerX *= fullW - 1;
+	if(typeof(centerY) == "undefined") centerY = halfH;
+	else centerY *= fullH - 1;
 	
 	var ratio = [];
 	ratio[0] = (10+strength) * 0.1;
@@ -310,10 +310,10 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
 	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW;
 	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH);
-	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
-		centerX = halfW;
-		centerY = halfH;
-	}
+	if(typeof(centerX) == "undefined") centerX = halfW;
+	else centerX *= fullW - 1;
+	if(typeof(centerY) == "undefined") centerY = halfH;
+	else centerY *= fullH - 1;
 	
 	var power = Math.exp(2.3*brightness);  // 0 ~ 1 remap the value
 	
@@ -419,10 +419,10 @@ function lenBlurEffect(radius, brightness, mask, centerX, centerY){
 	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
 	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW;
 	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH);
-	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
-		centerX = halfW;
-		centerY = halfH;
-	}
+	if(typeof(centerX) == "undefined") centerX = halfW;
+	else centerX *= fullW - 1;
+	if(typeof(centerY) == "undefined") centerY = halfH;
+	else centerY *= fullH - 1;
 	
 	var power = Math.exp(2.3*brightness);  // 0 ~ 1 remap the value
 	
@@ -493,10 +493,10 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
 	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW;
 	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH);
-	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
-		centerX = halfW;
-		centerY = halfH;
-	}
+	if(typeof(centerX) == "undefined") centerX = halfW;
+	else centerX *= fullW - 1;
+	if(typeof(centerY) == "undefined") centerY = halfH;
+	else centerY *= fullH - 1;
 	
 	degree %= 180;
 	if(degree < 0) degree += 180;
@@ -589,10 +589,10 @@ function zoomBlurEffect(strength, brightness, type, centerX, centerY){
 	var tmpPxArr = [];
 	var fullH = canvasB.height, fullW = canvasB.width;
 	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
-	if((typeof(centerX) == "undefined") || (typeof(centerY) == "undefined")){
-		centerX = halfW;
-		centerY = halfH;
-	}
+	if(typeof(centerX) == "undefined") centerX = halfW;
+	else centerX *= fullW - 1;
+	if(typeof(centerY) == "undefined") centerY = halfH;
+	else centerY *= fullH - 1;
 	
 	var power = Math.exp(2.3*brightness);  // 0 ~ 1 remap the value
 	
