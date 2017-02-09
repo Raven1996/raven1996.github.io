@@ -479,8 +479,8 @@ function lenBlurEffect(radius, lggamma, mask, centerX, centerY){
 
 /*	
 	// a circle random method just for referring
-	r = (1-Math.pow(Math.random(),2)) * radius;
-	theta = Math.random()*2*Math.PI;
+	var r = Math.pow(Math.random(),0.5) * radius;
+	var theta = Math.random()*2*Math.PI;
 	var dx = Math.cos(theta)*r;
 	var dy = Math.sin(theta)*r;
 */
