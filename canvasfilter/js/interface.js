@@ -165,7 +165,7 @@ function resetValues(index){
 			break
 		case 5:
 			div[0].value="5"
-			div[1].value="0.25"
+			div[1].value="0.34"
 			div[2].value="0"
 			div[3].value="0"
 			div[4].value="0.5"
@@ -173,7 +173,7 @@ function resetValues(index){
 			break
 		case 6:
 			div[0].value="2"
-			div[1].value="0.25"
+			div[1].value="0.34"
 			div[2].value="0"
 			div[3].value="0.5"
 			div[4].value="0.5"
@@ -181,14 +181,14 @@ function resetValues(index){
 		case 7:
 			div[0].value="5"
 			div[1].value="30"
-			div[2].value="0.25"
+			div[2].value="0.34"
 			div[3].value="0"
 			div[4].value="0.5"
 			div[5].value="0.5"
 			break
 		case 8:
 			div[0].value="0.05"
-			div[1].value="0.25"
+			div[1].value="0.34"
 			div[2].value="0"
 			div[3].value="0.5"
 			div[4].value="0.5"

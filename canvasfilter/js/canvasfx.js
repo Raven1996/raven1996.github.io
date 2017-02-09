@@ -302,7 +302,7 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
 }
 
-function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
+function normalBlurEffect(radius, lggamma, mask, type, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [], pxArr = [], rArr=[];
@@ -315,7 +315,7 @@ function normalBlurEffect(radius, brightness, mask, type, centerX, centerY){
 	if(typeof(centerY) == "undefined") centerY = halfH;
 	else centerY *= fullH - 1;
 	
-	var power = Math.exp(2.3*brightness);  // 0 ~ 1 remap the value
+	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -411,7 +411,7 @@ function fastSqrt(num){  // https://en.wikipedia.org/wiki/Fast_inverse_square_ro
 // actually very slow
 */
 
-function lenBlurEffect(radius, brightness, mask, centerX, centerY){
+function lenBlurEffect(radius, lggamma, mask, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -424,7 +424,7 @@ function lenBlurEffect(radius, brightness, mask, centerX, centerY){
 	if(typeof(centerY) == "undefined") centerY = halfH;
 	else centerY *= fullH - 1;
 	
-	var power = Math.exp(2.3*brightness);  // 0 ~ 1 remap the value
+	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -485,7 +485,7 @@ function lenBlurEffect(radius, brightness, mask, centerX, centerY){
 	var dy = Math.sin(theta)*r;
 */
 
-function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
+function motionBlurEffect(length, degree, lggamma, mask, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -512,7 +512,7 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 		ratioY = 1;
 	}
 	
-	var power = Math.exp(2.3*brightness);  // 0 ~ 1 remap the value
+	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
@@ -583,7 +583,7 @@ function motionBlurEffect(length, degree, brightness, mask, centerX, centerY){
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
 }
 
-function zoomBlurEffect(strength, brightness, type, centerX, centerY){
+function zoomBlurEffect(strength, lggamma, type, centerX, centerY){
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -594,7 +594,7 @@ function zoomBlurEffect(strength, brightness, type, centerX, centerY){
 	if(typeof(centerY) == "undefined") centerY = halfH;
 	else centerY *= fullH - 1;
 	
-	var power = Math.exp(2.3*brightness);  // 0 ~ 1 remap the value
+	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 	
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
