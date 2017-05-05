@@ -745,8 +745,7 @@ function mosaicEffect(size, type){
 			var resA = Math.round((totalA-0.0000000001) / totalW * 255);
 			for(var dx = 0; dx < size; dx ++)
 				for(var dy = 0; dy < size; dy ++){
-					var x = i + dx;
-					var y = j + dy;
+					var x = i + dx, y = j + dy;
 					if(x >= 0 && x < fullH && y >= 0 && y < fullW){
 						var p = (x*fullW + y)<<2;
 						pxData[p+0] = resR;
@@ -754,6 +753,43 @@ function mosaicEffect(size, type){
 						pxData[p+2] = resB;
 						pxData[p+3] = resA;
 					}
+				}
+		}
+	
+	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
+}
+
+function dotEffect(size){
+	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+	var pxData = imgData.data;
+	var tmpPxArr = [];
+	var fullH = canvasB.height, fullW = canvasB.width;
+	
+	for(var i = 0; i<fullH; i ++)
+		for(var j = 0; j<fullW; j ++){
+			var p = (i*fullW + j)<<2;
+			var total = (pxData[p+0]*38 + pxData[p+1]*75 + pxData[p+2]*15) >> 7;
+			total = Math.exp(Math.log(total/255) * 1.75);
+			tmpPxArr[p>>2] = total;
+		}
+	
+	var dratio = Math.sqrt(2)*(size-1)/2;
+	dratio = (dratio-1) / dratio;
+	for(var i = 0; i < fullH; i += size)
+		for(var j = 0; j < fullW; j += size){
+			for(var dx = 0; dx < size; dx ++)
+				for(var dy = 0; dy < size; dy ++){
+					var x = i + dx, y = j + dy, rx = dx-0.5*(size-1), ry = dy-0.5*(size-1);
+					var p = (x*fullW + y)<<2;
+					var total = 1 - tmpPxArr[p>>2];
+					var r = 0.70711 * total * (size-1);
+					var d = Math.sqrt(rx*rx + ry*ry);
+					d = dratio>0 ? d*dratio+1 : d
+					var fill = d>r ? d-r : 0;
+					fill >= 1 ? fill=255 : fill*=255;
+					pxData[p+0] = fill;
+					pxData[p+1] = fill;
+					pxData[p+2] = fill;
 				}
 		}
 	

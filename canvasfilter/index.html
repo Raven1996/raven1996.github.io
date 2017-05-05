@@ -141,6 +141,7 @@
 					<label class="center">X</label><input type="text" class="div8" onchange="previewCanvas(8)" /><label class="center">Y</label><input type="text" class="div8" onchange="previewCanvas(8)"/>
 				</div>
 			</div>
+			<p class="catagory">Other</p>
 			<div class="filterdiv">
 				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(9)">apply</a>
 				<p class="filtername" onclick="clickIndex(9)">Mosaic</p>
@@ -151,6 +152,13 @@
 						<option value="1">block centered</option>
 						<option value="2">cross centered</option>
 					</select>
+				</div>
+			</div>
+			<div class="filterdiv">
+				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(10)">apply</a>
+				<p class="filtername" onclick="clickIndex(10)">Dot</p>
+				<div class="ctrldiv inactive">
+					<label>size</label><input type="range" max="20" min="2" step="1" class="div10" onchange="previewCanvas(10)" oninput="updateValues(10)"/><p class="num value10"></p><br />
 				</div>
 			</div>
 		</span>

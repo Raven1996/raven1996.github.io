@@ -196,6 +196,10 @@ function resetValues(index){
 		case 9:
 			div[0].value="10"
 			div[1].value="0"
+			break
+		case 10:
+			div[0].value="4"
+			break
 	}
 }
 
@@ -239,6 +243,10 @@ function updateValues(index){
 			break
 		case 9:
 			value[0].innerText=div[0].value
+			break
+		case 10:
+			value[0].innerText=div[0].value
+			break
 	}
 }
 
@@ -325,6 +333,10 @@ function previewCanvas(index){
 		case 9:
 			mosaicEffect(parseInt(div[0].value),
 				parseInt(div[1].value))
+			break
+		case 10:
+			dotEffect(parseInt(div[0].value))
+			break
 	}
 }
 
