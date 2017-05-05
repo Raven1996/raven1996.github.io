@@ -774,7 +774,7 @@ function dotEffect(size){
 		}
 	
 	var rmax = 0.70711 * (size-1);
-	var dratio = (dratio-1) / dratio;
+	var dratio = (rmax-1) / rmax;
 	for(var i = 0; i < fullH; i += size)
 		for(var j = 0; j < fullW; j += size){
 			for(var dx = 0; dx < size; dx ++)
