@@ -773,18 +773,18 @@ function dotEffect(size){
 			tmpPxArr[p>>2] = total;
 		}
 	
-	var dratio = Math.sqrt(2)*(size-1)/2;
-	dratio = (dratio-1) / dratio;
+	var rmax = 0.70711 * (size-1);
+	var dratio = (dratio-1) / dratio;
 	for(var i = 0; i < fullH; i += size)
 		for(var j = 0; j < fullW; j += size){
 			for(var dx = 0; dx < size; dx ++)
 				for(var dy = 0; dy < size; dy ++){
-					var x = i + dx, y = j + dy, rx = dx-0.5*(size-1), ry = dy-0.5*(size-1);
+					var x = i + dx, y = j + dy, rx = dx - 0.5*(size-1), ry = dy - 0.5*(size-1);
 					var p = (x*fullW + y)<<2;
 					var total = 1 - tmpPxArr[p>>2];
-					var r = 0.70711 * total * (size-1);
+					var r = rmax * total;
 					var d = Math.sqrt(rx*rx + ry*ry);
-					d = dratio>0 ? d*dratio+1 : d
+					d = dratio>0 ? d*dratio+1 : d;
 					var fill = d>r ? d-r : 0;
 					fill >= 1 ? fill=255 : fill*=255;
 					pxData[p+0] = fill;
