@@ -768,9 +768,9 @@ function dotEffect(size){
 	for(var i = 0; i<fullH; i ++)
 		for(var j = 0; j<fullW; j ++){
 			var p = (i*fullW + j)<<2;
-			var total = (pxData[p+0]*38 + pxData[p+1]*75 + pxData[p+2]*15) >> 7;
-			total = Math.exp(Math.log(total/255) * 1.75);
-			tmpPxArr[p>>2] = total;
+			tmpPxArr[p+0] = Math.exp(Math.log(pxData[p+0]/255) * 1.75);
+			tmpPxArr[p+1] = Math.exp(Math.log(pxData[p+1]/255) * 1.75);
+			tmpPxArr[p+2] = Math.exp(Math.log(pxData[p+2]/255) * 1.75);
 		}
 	
 	var rmax = 0.70711 * (size-1);
@@ -780,16 +780,17 @@ function dotEffect(size){
 			for(var dx = 0; dx < size; dx ++)
 				for(var dy = 0; dy < size; dy ++){
 					var x = i + dx, y = j + dy, rx = dx - 0.5*(size-1), ry = dy - 0.5*(size-1);
-					var p = (x*fullW + y)<<2;
-					var total = 1 - tmpPxArr[p>>2];
-					var r = rmax * total;
+					if(x>=fullH || y>=fullW) break;
 					var d = Math.sqrt(rx*rx + ry*ry);
 					d = dratio>0 ? d*dratio+1 : d;
-					var fill = d>r ? d-r : 0;
-					fill >= 1 ? fill=255 : fill*=255;
-					pxData[p+0] = fill;
-					pxData[p+1] = fill;
-					pxData[p+2] = fill;
+					var p = (x*fullW + y)<<2;
+					for(var k = 0; k < 3; k ++){
+						var total = 1 - tmpPxArr[p+k];
+						var r = rmax * total;
+						var fill = d>r ? d-r : 0;
+						fill >= 1 ? fill=255 : fill*=255;
+						pxData[p+k] = fill;
+					}
 				}
 		}
 	
