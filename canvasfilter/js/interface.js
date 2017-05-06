@@ -199,6 +199,7 @@ function resetValues(index){
 			break
 		case 10:
 			div[0].value="4"
+			div[1].value="0"
 			break
 	}
 }
@@ -335,7 +336,8 @@ function previewCanvas(index){
 				parseInt(div[1].value))
 			break
 		case 10:
-			dotEffect(parseInt(div[0].value))
+			dotEffect(parseInt(div[0].value),
+				parseInt(div[1].value))
 			break
 	}
 }
