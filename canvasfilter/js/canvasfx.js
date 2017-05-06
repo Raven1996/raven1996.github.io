@@ -24,7 +24,7 @@ function greyEffect(type){
 	var fullH = canvasB.height, fullW = canvasB.width;
 	var fullS = fullH*fullW;
 	
-	for(var i = 0; i < fullS; i ++){
+	for(var i = 0; i < fullS; i++){
 		var r = pxData[(i<<2)+0];
 		var g = pxData[(i<<2)+1];
 		var b = pxData[(i<<2)+2];
@@ -85,7 +85,7 @@ function hslEffect(degreeH, percentS, percentL){
 	var ratio = (100 + percentS) * 0.01;
 	var power = Math.exp(-percentL * 0.01) ;
 	
-	for(var i = 0; i < fullS; i ++){
+	for(var i = 0; i < fullS; i++){
 		var r = pxData[(i<<2)+0];
 		var g = pxData[(i<<2)+1];
 		var b = pxData[(i<<2)+2];
@@ -115,8 +115,8 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 	if(typeof(centerY) == "undefined") centerY = halfH;
 	else centerY *= fullH - 1;
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			pxArr[p+3] = pxData[p+3] / 255;
 			pxArr[p+0] = pxData[p+0] / 255 * pxArr[p+3];
@@ -124,8 +124,8 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 			pxArr[p+2] = pxData[p+2] / 255 * pxArr[p+3];
 		}
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var motion = [], ratio;
 			switch(mask){
 				case 0 : ratio = 1; break;  // none;
@@ -137,7 +137,7 @@ function motionHarrisEffect(length, degree, mask, centerX, centerY){  // Harris 
 			motion[1] = 0;
 			motion[2] = -motion[0];
 			var tmpRGB = [], tmpA = [];
-			for(var k = 0; k < 3; k ++){
+			for(var k = 0; k < 3; k++){
 				tmpRGB[k] = 0, tmpA[k] = 0;
 				var x = i + motion[k]*ratioX, y = j + motion[k]*ratioY;
 				
@@ -200,8 +200,8 @@ function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 	ratio[1] = 1;
 	ratio[2] = (10-strength) * 0.1;
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			pxArr[p+3] = pxData[p+3] / 255;
 			pxArr[p+0] = pxData[p+0] / 255 * pxArr[p+3];
@@ -209,10 +209,10 @@ function zoomHarrisEffect(strength, centerX, centerY){  // Harris camera
 			pxArr[p+2] = pxData[p+2] / 255 * pxArr[p+3];
 		}
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var tmpRGB = [], tmpA = [];
-			for(var k = 0; k < 3; k ++){
+			for(var k = 0; k < 3; k++){
 				tmpRGB[k] = 0, tmpA[k] = 0;
 				var x = centerY + (i-centerY)*ratio[k], y = centerX + (j-centerX)*ratio[k];
 				
@@ -267,8 +267,8 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
 	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH);
 
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			pxArr[p+3] = pxData[p+3] / 255;
 			pxArr[p+0] = pxData[p+0] / 255 * pxArr[p+3];
@@ -276,8 +276,8 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 			pxArr[p+2] = pxData[p+2] / 255 * pxArr[p+3];
 		}
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var percent = Math.sqrt((i-halfH)*(i-halfH)+(j-halfW)*(j-halfW))*halfD_Re;
 			var ratio = strength < 0 ? (1-percent)+Math.exp(strength)*(percent) : (percent)+Math.exp(-strength)*(1-percent);
 			var tmpRGBA = [0, 0, 0, 0];
@@ -286,7 +286,7 @@ function distortionEffect(strength){  // recommend strength from -0.5 to 0.5
 			var x_ = x == fullH-1 ? x-1 : Math.floor(x);
 			var y_ = y == fullW-1 ? y-1 : Math.floor(y);
 			var kx0=x-x_, kx1=1-kx0, ky0=y-y_, ky1=1-ky0;
-			for(var k = 0; k < 4; k ++){
+			for(var k = 0; k < 4; k++){
 				tmpRGBA[k] += pxArr[((x_*fullW + y_)<<2)+k]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)+k]*kx1*ky0;
 				tmpRGBA[k] += pxArr[(((x_+1)*fullW + y_)<<2)+k]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)+k]*kx0*ky0;
 			}
@@ -317,8 +317,8 @@ function normalBlurEffect(radius, lggamma, mask, type, centerX, centerY){
 	
 	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = i*fullW + j;
 			var ratio = 0;
 			switch(mask){
@@ -338,8 +338,8 @@ function normalBlurEffect(radius, lggamma, mask, type, centerX, centerY){
 	power = 1 / power;
 	
 	// 1st step : vertical blur
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = i*fullW + j;
 			var blurR = rArr[p];
 			p = p << 2;
@@ -366,8 +366,8 @@ function normalBlurEffect(radius, lggamma, mask, type, centerX, centerY){
 		}
 	
 	// 2rd step horizontal blur
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = i*fullW + j;
 			var blurR = rArr[p];
 			p = p << 2;
@@ -426,8 +426,8 @@ function lenBlurEffect(radius, lggamma, mask, centerX, centerY){
 	
 	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			tmpPxArr[p+3] = pxData[p+3] / 255;
 			tmpPxArr[p+0] = Math.exp(Math.log(pxData[p+0]/255) * power) * tmpPxArr[p+3];
@@ -437,8 +437,8 @@ function lenBlurEffect(radius, lggamma, mask, centerX, centerY){
 	
 	power = 1 / power;
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var ratio;
 			switch(mask){
 				case 0 : ratio = 1; break;  // none
@@ -514,8 +514,8 @@ function motionBlurEffect(length, degree, lggamma, mask, centerX, centerY){
 	
 	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			tmpPxArr[p+3] = pxData[p+3] / 255;
 			tmpPxArr[p+0] = Math.exp(Math.log(pxData[p+0]/255) * power) * tmpPxArr[p+3];
@@ -525,8 +525,8 @@ function motionBlurEffect(length, degree, lggamma, mask, centerX, centerY){
 	
 	power = 1 / power;
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var ratio;
 			switch(mask){
 				case 0 : ratio = 1; break;  // none
@@ -596,8 +596,8 @@ function zoomBlurEffect(strength, lggamma, type, centerX, centerY){
 	
 	var power = Math.exp(2.3*lggamma);  // 0 ~ 1 remap the value
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			tmpPxArr[p+3] = pxData[p+3] / 255;
 			tmpPxArr[p+0] = Math.exp(Math.log(pxData[p+0]/255) * power) * tmpPxArr[p+3];
@@ -607,8 +607,8 @@ function zoomBlurEffect(strength, lggamma, type, centerX, centerY){
 	
 	power = 1 / power;
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var zoomX = (centerY-i) * strength, zoomY = (centerX-j) * strength;
 			var zoomX_ = Math.abs(zoomX), zoomY_ = Math.abs(zoomY);
 			var p = (i*fullW + j)<<2;
@@ -712,8 +712,8 @@ function mosaicEffect(size, type){
 		break;
 	}
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			tmpPxArr[p+3] = pxData[p+3] / 255;
 			tmpPxArr[p+0] = Math.round(pxData[p+0] * tmpPxArr[p+3]);
@@ -725,8 +725,8 @@ function mosaicEffect(size, type){
 		for(var j = beginJ; j < endJ; j += size){
 			var totalW = 0;
 			var totalR = 0, totalG = 0, totalB = 0, totalA = 0;
-			for(var dx = 0; dx < size; dx ++)
-				for(var dy = 0; dy < size; dy ++){
+			for(var dx = 0; dx < size; dx++)
+				for(var dy = 0; dy < size; dy++){
 					var x = i + dx;
 					var y = j + dy;
 					if(x >= 0 && x < fullH && y >= 0 && y < fullW){
@@ -735,7 +735,7 @@ function mosaicEffect(size, type){
 						totalG += tmpPxArr[p+1];
 						totalB += tmpPxArr[p+2];
 						totalA += tmpPxArr[p+3];
-						totalW ++;
+						totalW++;
 					}
 				}
 			totalA += 0.0000000001;
@@ -743,8 +743,8 @@ function mosaicEffect(size, type){
 			var resG = Math.round(totalG / totalA);
 			var resB = Math.round(totalB / totalA);
 			var resA = Math.round((totalA-0.0000000001) / totalW * 255);
-			for(var dx = 0; dx < size; dx ++)
-				for(var dy = 0; dy < size; dy ++){
+			for(var dx = 0; dx < size; dx++)
+				for(var dy = 0; dy < size; dy++){
 					var x = i + dx, y = j + dy;
 					if(x >= 0 && x < fullH && y >= 0 && y < fullW){
 						var p = (x*fullW + y)<<2;
@@ -765,20 +765,22 @@ function dotEffect(size, type){
 	var tmpPxArr = [];
 	var fullH = canvasB.height, fullW = canvasB.width;
 	
-	for(var i = 0; i<fullH; i ++)
-		for(var j = 0; j<fullW; j ++){
+	for(var i = 0; i<fullH; i++)
+		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
-			tmpPxArr[p+0] = Math.exp(Math.log(pxData[p+0]/255) * 1.75);
-			tmpPxArr[p+1] = Math.exp(Math.log(pxData[p+1]/255) * 1.75);
-			tmpPxArr[p+2] = Math.exp(Math.log(pxData[p+2]/255) * 1.75);
+			for(var k = 0; k<3; k++){
+				tmpPxArr[p+k] = pxData[p+k]/255
+				tmpPxArr[p+k] = tmpPxArr[p+k]>0.5 ? 0.5+tmpPxArr[p+k]*(tmpPxArr[p+k]-0.5) :tmpPxArr[p+k]*(1.5-tmpPxArr[p+k]);
+				tmpPxArr[p+k] = Math.exp(Math.log(tmpPxArr[p+k]) * 1.75);
+			}
 		}
 	
 	var rmax = type==0 ? 0.70711*size : 0.5*size;
 	var dratio = (rmax-0.5) / rmax;
 	for(var i = 0; i < fullH; i += size)
 		for(var j = 0; j < fullW; j += size){
-			for(var dx = 0; dx < size; dx ++)
-				for(var dy = 0; dy < size; dy ++){
+			for(var dx = 0; dx < size; dx++)
+				for(var dy = 0; dy < size; dy++){
 					var x = i + dx, y = j + dy, rx = Math.abs(dx - 0.5*(size)), ry = Math.abs(dy - 0.5*(size));
 					if(x>=fullH || y>=fullW) break;
 					if (type==1 && rx+ry>rmax) {
@@ -788,7 +790,7 @@ function dotEffect(size, type){
 					var d = Math.sqrt(rx*rx + ry*ry);
 					d = dratio>0 ? d*dratio+1 : d;
 					var p = (x*fullW + y)<<2;
-					for(var k = 0; k < 3; k ++){
+					for(var k = 0; k < 3; k++){
 						var total = 1 - tmpPxArr[p+k];
 						var r = rmax * total;
 						var fill = d>r ? d-r : 0;
