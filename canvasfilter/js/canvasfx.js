@@ -795,7 +795,7 @@ function dotEffect(size, type){
 						var r = rmax * tmpPxArr[p+k];
 						var fill = d - r;
 						if((type==0&&(dx==0||dy==0))||(type==1&&rmax-rx-ry==0)) fill=fill*2-1;
-							else if(type==1&&rmax-rx-ry==0.5) fill = fill*1.11-0.11;  // to fix size = 3
+						else if(type==1&&rmax-rx-ry==0.5) fill = fill*1.11-0.11;  // to fix size = 3
 						pxData[p+k] = fill*255;
 					}
 				}
