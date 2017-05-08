@@ -764,16 +764,15 @@ function dotEffect(size, type){
 	var pxData = imgData.data;
 	var tmpPxArr = [];
 	var fullH = canvasB.height, fullW = canvasB.width;
-	if(size==1) type=0;
 	
 	for(var i = 0; i<fullH; i++)
 		for(var j = 0; j<fullW; j++){
 			var p = (i*fullW + j)<<2;
 			for(var k = 0; k<3; k++){
 				var tmp = pxData[p+k]/255
-				tmpPxArr[p+k] = tmp>0.5 ? 0.5+tmp*(tmp-0.5) : tmp*(1.5-tmp);
-				tmpPxArr[p+k] = 1 - Math.exp(Math.log(tmpPxArr[p+k]) * 1.75);
-				//tmpPxArr[p+k] = (((-4*tmp+6)*tmp-2.8)*tmp-0.2)*tmp+1  // new curve
+				//tmpPxArr[p+k] = tmp>0.5 ? 0.5+tmp*(tmp-0.5) : tmp*(1.5-tmp);
+				//tmpPxArr[p+k] = 1 - Math.exp(Math.log(tmpPxArr[p+k]) * 1.75);
+				tmpPxArr[p+k] = (((-4*tmp+6)*tmp-2.8)*tmp-0.2)*tmp+1  // new curve
 			}
 		}
 	
@@ -794,11 +793,10 @@ function dotEffect(size, type){
 					var p = (x*fullW + y)<<2;
 					for(var k = 0; k < 3; k++){
 						var r = rmax * tmpPxArr[p+k];
-						var fill = d>r ? d-r : 0;
+						var fill = d - r;
 						if((type==0&&(dx==0||dy==0))||(type==1&&rmax-rx-ry==0)) fill=fill*2-1;
-						else if(type==1&&rmax-rx-ry==0.5) fill = fill*1.2-0.2;
-						fill >= 1 ? fill=255 : fill*=255;
-						pxData[p+k] = fill;
+							else if(type==1&&rmax-rx-ry==0.5) fill = fill*1.11-0.11;  // to fix size = 3
+						pxData[p+k] = fill*255;
 					}
 				}
 		}
