@@ -794,8 +794,14 @@ function dotEffect(size, type){
 						var fill = d>0 ? d-r+0.5 : 1-2*r;
 						fill = fill<0 ? 0 : fill>1? 1 : fill;
 						// fill correction
-						if((type==0&&(dx==0||dy==0))||(type==1&&rmax-rx-ry==0)) fill = fill>0.5 ? (fill-0.5)*(fill-0.5)*4 : 0;
-						else if((type==1&&rmax-rx-ry==0.5)) fill = fill<0.5 ? fill*fill*2 : fill;
+						if((type==0&&(dx==0||dy==0))||(type==1&&rmax-rx-ry==0)) {
+							if((type==0&&dx==0&&dy==0)||(type==1&&(dx==0||dy==0))) fill = fill>0.5 ? (fill-0.5)*(fill-0.5)*4 : 0;
+							else fill = fill>0.5 ? 2*fill-1 : 0;
+						}
+						else if((type==1&&rmax-rx-ry==0.5)){
+							if (dx==0||dy==0) fill = fill<0.5 ? fill*fill*2 : fill;
+							else fill = fill<0.5 ? fill*(fill + 0.5) : fill;
+						} 
 						// gamma correction
 						pxData[p+k] = Math.exp(Math.log(fill) * 0.455)*255;
 					}
