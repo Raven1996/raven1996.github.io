@@ -777,7 +777,6 @@ function dotEffect(size, type){
 		}
 	
 	var rmax = type==0 ? 0.70711*size : 0.5*size;
-	var dratio = (rmax-0.5) / rmax;
 	for(var i = 0; i < fullH; i += size)
 		for(var j = 0; j < fullW; j += size){
 			for(var dx = 0; dx < size; dx++)
@@ -789,14 +788,16 @@ function dotEffect(size, type){
 						ry = rmax - ry;
 					}
 					var d = Math.sqrt(rx*rx + ry*ry);
-					d = dratio>0 ? d*dratio+1 : d;
 					var p = (x*fullW + y)<<2;
 					for(var k = 0; k < 3; k++){
 						var r = rmax * tmpPxArr[p+k];
-						var fill = d - r;
-						if((type==0&&(dx==0||dy==0))||(type==1&&rmax-rx-ry==0)) fill=fill*2-1;
-						else if(type==1&&rmax-rx-ry==0.5) fill = fill*1.11-0.11;  // to fix size = 3
-						pxData[p+k] = fill*255;
+						var fill = d>0 ? d-r+0.5 : 1-2*r;
+						fill = fill<0 ? 0 : fill>1? 1 : fill;
+						// fill correction
+						if((type==0&&(dx==0||dy==0))||(type==1&&rmax-rx-ry==0)) fill = fill>0.5 ? (fill-0.5)*(fill-0.5)*4 : 0;
+						else if((type==1&&rmax-rx-ry==0.5)) fill = fill<0.5 ? fill*fill*2 : fill;
+						// gamma correction
+						pxData[p+k] = Math.exp(Math.log(fill) * 0.455)*255;
 					}
 				}
 		}
