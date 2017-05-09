@@ -19,6 +19,7 @@ window.onload = function(){
 				canvasB.setAttribute('width', image.width)
 				canvasB.setAttribute('height', image.height)
 				ctxA.drawImage(image, 0, 0)
+				for (var i=0; i<11; i++) resetValues(i)
 				clickIndex(-1)
 				noEffect()
 				setScaleType(1)
@@ -89,6 +90,7 @@ function importFile(file){
 			ctxA.clearRect(0, 0, this.width, this.height)
 			ctxA.drawImage(this, 0, 0)
 			delete this
+			for (var i=0; i<11; i++) resetValues(i)
 			clickIndex(-1)
 			noEffect()
 			setScaleType(1)
@@ -105,7 +107,6 @@ function clickIndex(index){
 			if (i == index){
 				removeClass(applyButtom[i], 'inactive')
 				removeClass(ctrlDiv[i], 'inactive')
-				resetValues(index)
 				updateValues(index)
 				previewCanvas(index)
 			}else{

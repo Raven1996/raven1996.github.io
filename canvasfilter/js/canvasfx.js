@@ -791,7 +791,7 @@ function dotEffect(size, type){
 					var p = (x*fullW + y)<<2;
 					for(var k = 0; k < 3; k++){
 						var r = rmax * tmpPxArr[p+k];
-						var fill = d>0 ? d-r+0.5 : 1-2*r;
+						var fill = d>0 ? d-r+0.5 : 1-r*(r+1.5);
 						fill = fill<0 ? 0 : fill>1? 1 : fill;
 						// fill correction
 						if((type==0&&(dx==0||dy==0))||(type==1&&rmax-rx-ry==0)) {
