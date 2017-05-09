@@ -166,7 +166,7 @@ function resetValues(index){
 			break
 		case 5:
 			div[0].value="5"
-			div[1].value="0.34"
+			div[1].value="2.2"
 			div[2].value="0"
 			div[3].value="0"
 			div[4].value="0.5"
@@ -174,7 +174,7 @@ function resetValues(index){
 			break
 		case 6:
 			div[0].value="2"
-			div[1].value="0.34"
+			div[1].value="2.2"
 			div[2].value="0"
 			div[3].value="0.5"
 			div[4].value="0.5"
@@ -182,21 +182,22 @@ function resetValues(index){
 		case 7:
 			div[0].value="5"
 			div[1].value="30"
-			div[2].value="0.34"
+			div[2].value="2.2"
 			div[3].value="0"
 			div[4].value="0.5"
 			div[5].value="0.5"
 			break
 		case 8:
 			div[0].value="0.05"
-			div[1].value="0.34"
+			div[1].value="2.2"
 			div[2].value="0"
 			div[3].value="0.5"
 			div[4].value="0.5"
 			break
 		case 9:
 			div[0].value="10"
-			div[1].value="0"
+			div[1].value="2.2"
+			div[2].value="0"
 			break
 		case 10:
 			div[0].value="4"
@@ -245,6 +246,7 @@ function updateValues(index){
 			break
 		case 9:
 			value[0].innerText=div[0].value
+			value[1].innerText=div[1].value
 			break
 		case 10:
 			value[0].innerText=div[0].value
@@ -334,11 +336,13 @@ function previewCanvas(index){
 			break
 		case 9:
 			mosaicEffect(parseInt(div[0].value),
-				parseInt(div[1].value))
+				parseFloat(div[1].value),
+				parseInt(div[2].value))
 			break
 		case 10:
 			dotEffect(parseInt(div[0].value),
-				parseInt(div[1].value))
+				parseInt(div[1].value)
+				)
 			break
 	}
 }

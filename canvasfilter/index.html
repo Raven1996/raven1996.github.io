@@ -28,7 +28,7 @@
 		<span id="ctrlspan">
 			<p class="catagory">Adjust</p>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="javascrpt:applyEffect();clickIndex(0)">apply</a>
+				<a class="applybuttom inactive" onclick="javascrpt:applyEffect();resetValues(0);clickIndex(0)">apply</a>
 				<p class="filtername" onclick="clickIndex(0)">HSL</p>
 				<div class="ctrldiv inactive">
 					<label>hue</label><input type="range" max="180" min="-180" step="1" class="div0" onchange="previewCanvas(0)" oninput="updateValues(0)"/><p class="num value0"></p><br />
@@ -37,7 +37,7 @@
 				</div>
 			</div>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(1)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(1);clickIndex(1)">apply</a>
 				<p class="filtername" onclick="clickIndex(1)">Grey</p>
 				<div class="ctrldiv inactive">
 				<label>type</label><select class="div1" onchange="previewCanvas(1)">   
@@ -47,7 +47,7 @@
 				</div>
 			</div>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(2)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(2);clickIndex(2)">apply</a>
 				<p class="filtername" onclick="clickIndex(2)">Distortion</p>
 				<div class="ctrldiv inactive">
 					<label>strength</label><input type="range" max="0.5" min="-0.5" step="0.01" class="div2" onchange="previewCanvas(2)" oninput="updateValues(2)"/><p class="num value2"></p><br />
@@ -55,7 +55,7 @@
 			</div>
 			<p class="catagory">Harris Shutter</p>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(3)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(3);clickIndex(3)">apply</a>
 				<p class="filtername" onclick="clickIndex(3)">Motion Harris Shutter</p>
 				<div class="ctrldiv inactive">
 					<label>length</label><input type="range" max="25" min="0" step="1" class="div3" onchange="previewCanvas(3)" oninput="updateValues(3)"/><p class="num value3"></p><br />
@@ -70,7 +70,7 @@
 				</div>
 			</div>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(4)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(4);clickIndex(4)">apply</a>
 				<p class="filtername" onclick="clickIndex(4)">Zoom Harris Shutter</p>
 				<div class="ctrldiv inactive">
 					<label>strength</label><input type="range" max="1" min="-1" step="0.01" class="div4" onchange="previewCanvas(4)" oninput="updateValues(4)"/><p class="num value4"></p><br />
@@ -79,11 +79,11 @@
 			</div>
 			<p class="catagory">Blur</p>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(5)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(5);clickIndex(5)">apply</a>
 				<p class="filtername" onclick="clickIndex(5)">Normal Blur</p>
 				<div class="ctrldiv inactive">
 					<label>radius</label><input type="range" max="100" min="0" step="1" class="div5" onchange="previewCanvas(5)" oninput="updateValues(5)"/><p class="num value5"></p><br />
-					<label title="lg(gamma)">brightness</label><input type="range" max="1" min="0" step="0.01" class="div5" onchange="previewCanvas(5)" oninput="updateValues(5)"/><p class="num value5"></p><br />
+					<label>gamma</label><input type="range" max="5" min="1" step="0.1" class="div5" onchange="previewCanvas(5)" oninput="updateValues(5)"/><p class="num value5"></p><br />
 					<label>mask</label><select class="div5" onchange="previewCanvas(5)">   
 						<option value="0">none</option>   
 						<option value="1">round</option>
@@ -98,11 +98,11 @@
 				</div>
 			</div>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(6)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(6);clickIndex(6)">apply</a>
 				<p class="filtername" onclick="clickIndex(6)">Len Blur</p>
 				<div class="ctrldiv inactive">
 					<label>radius</label><input type="range" max="25" min="0" step="1" class="div6" onchange="previewCanvas(6)" oninput="updateValues(6)"/><p class="num value6"></p><br />
-					<label title="lg(gamma)">brightness</label><input type="range" max="1" min="0" step="0.01" class="div6" onchange="previewCanvas(6)" oninput="updateValues(6)"/><p class="num value6"></p><br />
+					<label>gamma</label><input type="range" max="5" min="1" step="0.1" class="div6" onchange="previewCanvas(6)" oninput="updateValues(6)"/><p class="num value6"></p><br />
 					<label>mask</label><select class="div6" onchange="previewCanvas(6)">   
 						<option value="0">none</option>   
 						<option value="1">round</option>
@@ -113,12 +113,12 @@
 				</div>
 			</div>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(7)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(7);clickIndex(7)">apply</a>
 				<p class="filtername" onclick="clickIndex(7)">Motion Blur</p>
 				<div class="ctrldiv inactive">
 					<label>length</label><input type="range" max="100" min="0" step="1" class="div7" onchange="previewCanvas(7)" oninput="updateValues(7)"/><p class="num value7"></p><br />
 					<label>degree</label><input type="range" max="180" min="0" step="1" class="div7" onchange="previewCanvas(7)" oninput="updateValues(7)"/><p class="num value7"></p><br />
-					<label title="lg(gamma)">brightness</label><input type="range" max="1" min="0" step="0.01" class="div7" onchange="previewCanvas(7)" oninput="updateValues(7)"/><p class="num value7"></p><br />
+					<label>gamma</label><input type="range" max="5" min="1" step="0.1" class="div7" onchange="previewCanvas(7)" oninput="updateValues(7)"/><p class="num value7"></p><br />
 					<label>mask</label><select class="div7" onchange="previewCanvas(7)">   
 						<option value="0">none</option>   
 						<option value="1">round</option>
@@ -129,11 +129,11 @@
 				</div>
 			</div>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(8)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(8);clickIndex(8)">apply</a>
 				<p class="filtername" onclick="clickIndex(8)">Zoom Blur</p>
 				<div class="ctrldiv inactive">
 					<label>strength</label><input type="range" max="1" min="0" step="0.01" class="div8" onchange="previewCanvas(8)" oninput="updateValues(8)"/><p class="num value8"></p><br />
-					<label title="lg(gamma)">brightness</label><input type="range" max="1" min="0" step="0.01" class="div8" onchange="previewCanvas(8)" oninput="updateValues(8)"/><p class="num value8"></p><br />
+					<label>gamma</label><input type="range" max="5" min="1" step="0.1" class="div8" onchange="previewCanvas(8)" oninput="updateValues(8)"/><p class="num value8"></p><br />
 					<label>type</label><select class="div8" onchange="previewCanvas(8)">   
 						<option value="0">hard edge</option>   
 						<option value="1">soft edge</option>
@@ -143,10 +143,11 @@
 			</div>
 			<p class="catagory">Other</p>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(9)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(9);clickIndex(9)">apply</a>
 				<p class="filtername" onclick="clickIndex(9)">Mosaic</p>
 				<div class="ctrldiv inactive">
 					<label>size</label><input type="range" max="100" min="1" step="1" class="div9" onchange="previewCanvas(9)" oninput="updateValues(9)"/><p class="num value9"></p><br />
+					<label>gamma</label><input type="range" max="5" min="1" step="0.1" class="div9" onchange="previewCanvas(9)" oninput="updateValues(9)"/><p class="num value9"></p><br />
 					<label>type</label><select class="div9" onchange="previewCanvas(9)">   
 						<option value="0">left-top</option>   
 						<option value="1">block centered</option>
@@ -155,7 +156,7 @@
 				</div>
 			</div>
 			<div class="filterdiv">
-				<a class="applybuttom inactive" onclick="applyEffect();clickIndex(10)">apply</a>
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(10);clickIndex(10)">apply</a>
 				<p class="filtername" onclick="clickIndex(10)">Dot</p>
 				<div class="ctrldiv inactive">
 					<label title="even number is better">size</label><input type="range" max="20" min="2" step="1" class="div10" onchange="previewCanvas(10)" oninput="updateValues(10)"/><p class="num value10"></p><br />
