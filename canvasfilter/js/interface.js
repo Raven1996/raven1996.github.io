@@ -168,7 +168,7 @@ function resetValues(index){
 			div[0].value="5"
 			div[1].value="2.2"
 			div[2].value="0"
-			div[3].value="0"
+			div[3].value="1"
 			div[4].value="0.5"
 			div[5].value="0.5"
 			break
@@ -200,8 +200,8 @@ function resetValues(index){
 			div[2].value="0"
 			break
 		case 10:
-			div[0].value="4"
-			div[1].value="0"
+			div[0].value="6"
+			div[1].value="1"
 			break
 	}
 }
@@ -269,10 +269,6 @@ function previewCanvas(index){
 			distortionEffect(parseFloat(div[0].value))
 			break
 		case 3:
-			if(parseFloat(div[3].value)>1) div[3].value=1
-			else if(parseFloat(div[3].value)<0) div[3].value=0
-			if(parseFloat(div[4].value)>1) div[4].value=1
-			else if(parseFloat(div[4].value)<0) div[4].value=0
 			motionHarrisEffect(parseFloat(div[0].value),
 				parseInt(div[1].value),
 				parseInt(div[2].value),
@@ -280,20 +276,20 @@ function previewCanvas(index){
 				parseFloat(div[4].value))
 			break
 		case 4:
-			if(parseFloat(div[1].value)>1) div[1].value=1
-			else if(parseFloat(div[1].value)<0) div[1].value=0
-			if(parseFloat(div[2].value)>1) div[2].value=1
-			else if(parseFloat(div[2].value)<0) div[2].value=0
 			zoomHarrisEffect(parseFloat(div[0].value),
 				parseFloat(div[1].value),
 				parseFloat(div[2].value))
 			break
 		case 5:
-			if(parseFloat(div[4].value)>1) div[4].value=1
-			else if(parseFloat(div[4].value)<0) div[4].value=0
-			if(parseFloat(div[5].value)>1) div[5].value=1
-			else if(parseFloat(div[5].value)<0) div[5].value=0
+			if (parseFloat(div[0].value)<=15)
 			normalBlurEffect(parseFloat(div[0].value),
+				parseFloat(div[1].value),
+				parseInt(div[2].value),
+				parseInt(div[3].value),
+				parseFloat(div[4].value),
+				parseFloat(div[5].value))
+			else
+			fastBlurEffect(parseFloat(div[0].value),
 				parseFloat(div[1].value),
 				parseInt(div[2].value),
 				parseInt(div[3].value),
@@ -301,10 +297,6 @@ function previewCanvas(index){
 				parseFloat(div[5].value))
 			break
 		case 6:
-			if(parseFloat(div[3].value)>1) div[3].value=1
-			else if(parseFloat(div[3].value)<0) div[3].value=0
-			if(parseFloat(div[4].value)>1) div[4].value=1
-			else if(parseFloat(div[4].value)<0) div[4].value=0
 			lenBlurEffect(parseFloat(div[0].value),
 				parseFloat(div[1].value),
 				parseInt(div[2].value),
@@ -312,10 +304,6 @@ function previewCanvas(index){
 				parseFloat(div[4].value))
 			break
 		case 7:
-			if(parseFloat(div[4].value)>1) div[4].value=1
-			else if(parseFloat(div[4].value)<0) div[4].value=0
-			if(parseFloat(div[5].value)>1) div[5].value=1
-			else if(parseFloat(div[5].value)<0) div[5].value=0
 			motionBlurEffect(parseFloat(div[0].value),
 				parseInt(div[1].value),
 				parseFloat(div[2].value),
@@ -324,10 +312,6 @@ function previewCanvas(index){
 				parseFloat(div[5].value))
 			break
 		case 8:
-			if(parseFloat(div[3].value)>1) div[3].value=1
-			else if(parseFloat(div[3].value)<0) div[3].value=0
-			if(parseFloat(div[4].value)>1) div[4].value=1
-			else if(parseFloat(div[4].value)<0) div[4].value=0
 			zoomBlurEffect(parseFloat(div[0].value),
 				parseFloat(div[1].value),
 				parseInt(div[2].value),
