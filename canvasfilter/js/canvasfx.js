@@ -9,16 +9,78 @@ function setCanvasById(nameA, nameB) {
 }
 
 function applyEffect() {
+	canvasA.width = canvasB.width;
+	canvasA.height = canvasB.height;
 	imgData = ctxB.getImageData(0, 0, canvasB.width, canvasB.height);
 	ctxA.putImageData(imgData, 0, 0, 0, 0, canvasA.width, canvasA.height);
 }
 
 function noEffect() {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	ctxB.putImageData(imgData, 0, 0, 0, 0, canvasB.width, canvasB.height);
 }
 
+
+function resizeEffect(width, height, gamma=2.2) {
+	canvasB.width = width
+	canvasB.height = height
+	var imgDataA = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+	var pxDataA = imgDataA.data;
+	var imgDataB = ctxB.getImageData(0, 0, canvasB.width, canvasB.height);
+	var pxDataB = imgDataB.data;
+	var tmpPxArr = [];
+	var originW = canvasA.width, originH = canvasA.height;
+	var ratioW = originW/width, ratioH = originH/height
+	
+	for (var i = 0; i < originH; i++)
+		for (var j = 0; j < originW; j++) {
+			var p = (i*originW + j)<<2;
+			tmpPxArr[p|3] = pxDataA[p|3] / 255;
+			tmpPxArr[p] = Math.exp(Math.log(pxDataA[p]/255) * gamma) * tmpPxArr[p|3];
+			tmpPxArr[p|1] = Math.exp(Math.log(pxDataA[p|1]/255) * gamma) * tmpPxArr[p|3];
+			tmpPxArr[p|2] = Math.exp(Math.log(pxDataA[p|2]/255) * gamma) * tmpPxArr[p|3];
+		}
+	
+	gamma = 1 / gamma;
+	
+	for (var i = 0; i < height; i++)
+		for (var j = 0; j < width; j++) {
+			var lowH = i*ratioH, upH = (i+1)*ratioH;
+			var lowW = j*ratioW, upW = (j+1)*ratioW;
+			if (upH > originH+1) upH = originH+1;
+			if (upW > originW+1) upW = originW+1;
+			var totalR = 0, totalG = 0, totalB = 0, totalA = 0;
+			
+			for (var x = Math.floor(lowH); x < upH; x++)
+				for (var y = Math.floor(lowW); y < upW; y++) {
+					var a = 1, b = 1, pp = (x*originW + y)<<2;
+					if (lowH-x > 0) a -= lowH-x;
+					if (x+1-upH > 0) a -= x+1-upH;
+					if (lowW-y > 0) b -= lowW-y;
+					if (y+1-upW > 0) b -= y+1-upW;
+					totalR += a*b*tmpPxArr[pp];
+					totalG += a*b*tmpPxArr[pp|1];
+					totalB += a*b*tmpPxArr[pp|2];
+					totalA += a*b*tmpPxArr[pp|3];
+				}
+			
+			
+			var p = (i*width + j)<<2;
+			totalA += 0.00000001;
+			pxDataB[p] = Math.exp(Math.log(totalR/totalA) * gamma) * 255;
+			pxDataB[p|1] = Math.exp(Math.log(totalG/totalA) * gamma) * 255;
+			pxDataB[p|2] = Math.exp(Math.log(totalB/totalA) * gamma) * 255;
+			pxDataB[p|3] = (totalA-0.00000001) / ratioH / ratioW * 255;
+		}
+	
+	ctxB.putImageData(imgDataB, 0, 0, 0, 0, width, height);
+}
+
 function greyEffect(type=0) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var fullH = canvasB.height, fullW = canvasB.width;
@@ -77,6 +139,8 @@ function rgbToHsl(r, g, b) {
 }
 
 function hslEffect(degreeH=0, percentS=0, percentL=0) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var fullH = canvasB.height, fullW = canvasB.width;
@@ -100,6 +164,8 @@ function hslEffect(degreeH=0, percentS=0, percentL=0) {
 }
 
 function motionHarrisEffect(length, degree, mask=0, centerX=0.5, centerY=0.5) {  // Harris shutter
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var pxArr = [];
@@ -185,6 +251,8 @@ function motionHarrisEffect(length, degree, mask=0, centerX=0.5, centerY=0.5) { 
 }
 
 function zoomHarrisEffect(strength, centerX=0.5, centerY=0.5) {  // Harris camera
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var pxArr = [];
@@ -260,6 +328,8 @@ function zoomHarrisEffect(strength, centerX=0.5, centerY=0.5) {  // Harris camer
 }
 
 function distortionEffect(strength) {  // recommend strength from -0.5 to 0.5
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var pxArr = [];
@@ -303,6 +373,8 @@ function distortionEffect(strength) {  // recommend strength from -0.5 to 0.5
 }
 
 function normalBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=0.5) {  // type : 0 boxy, 1 triangular, 2 gaussian
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [], pxArr = [], rArr=[];
@@ -405,6 +477,8 @@ function normalBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, center
 }
 
 function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=0.5) {  // type : 0 boxy, 1 triangular, 2 gaussian
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [], pxArr = [], ij=[];
@@ -511,6 +585,8 @@ function fastSqrt(num) {  // https://en.wikipedia.org/wiki/Fast_inverse_square_r
 */
 
 function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -583,6 +659,8 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 */
 
 function motionBlurEffect(length, degree, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -679,6 +757,8 @@ function motionBlurEffect(length, degree, gamma=2.2, mask=0, centerX=0.5, center
 }
 
 function zoomBlurEffect(strength, gamma=2.2, type=0, centerX=0.5, centerY=0.5) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -772,6 +852,8 @@ function zoomBlurEffect(strength, gamma=2.2, type=0, centerX=0.5, centerY=0.5) {
 }
 
 function mosaicEffect(size, gamma=2.2, type=0) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -854,6 +936,8 @@ function mosaicEffect(size, gamma=2.2, type=0) {
 }
 
 function dotEffect(size, type=0) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
 	var tmpPxArr = [];
@@ -861,22 +945,12 @@ function dotEffect(size, type=0) {
 	if (size<=1) return;
 	
 	if (size>2 || type==0) {
-		for (var i = 0; i < fullH; i++)
-			for (var j = 0; j < fullW; j++) {
-				var p = (i*fullW + j)<<2;
-				for (var k = 0; k < 3; k++) {
-					var tmp = pxData[p|k]/255
-					// tmpPxArr[p|k] = tmp>0.5 ? 0.5+tmp*(tmp-0.5) : tmp*(1.5-tmp);
-					// tmpPxArr[p|k] = 1 - Math.exp(Math.log(tmpPxArr[p|k]) * 1.75);
-					tmpPxArr[p|k] = (((-4*tmp+6)*tmp-2.8)*tmp-0.2)*tmp+1  // new curve
-				}
-			}
 		var rmax = type==0 ? 0.707107*size : 0.5*size;
 		for (var i = 0; i < fullH; i += size)
 			for (var j = 0; j < fullW; j += size) {
 				for (var dx = 0; dx < size; dx++)
 					for (var dy = 0; dy < size; dy++) {
-						var x = i + dx, y = j + dy, rx = Math.abs(dx - 0.5*(size)), ry = Math.abs(dy - 0.5*(size));
+						var x = i + dx, y = j + dy, rx = Math.abs(dx - 0.5*size), ry = Math.abs(dy - 0.5*size);
 						if (x>=fullH || y>=fullW) break;
 						if (type==1 && rx+ry>rmax) {
 							rx = rmax - rx;
@@ -885,7 +959,8 @@ function dotEffect(size, type=0) {
 						var d = Math.sqrt(rx*rx + ry*ry);
 						var p = (x*fullW + y)<<2;
 						for (var k = 0; k < 3; k++) {
-							var r = rmax * tmpPxArr[p|k];
+							var tmp = pxData[p|k]/255
+							var r = ((((-4*tmp+6)*tmp-2.8)*tmp-0.2)*tmp+1) * rmax;  // a quadratic fitting curve
 							var fill = d>0 ? d-r+0.5 : 1-r*(r+1.5);
 							fill = fill<0 ? 0 : fill>1? 1 : fill;
 							// fill correction
@@ -913,6 +988,48 @@ function dotEffect(size, type=0) {
 				}
 			}
 	}
+	
+	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
+}
+
+function lineEffect(size, type=0) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
+	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+	var pxData = imgData.data;
+	var tmpPxArr = [];
+	var fullH = canvasB.height, fullW = canvasB.width;
+	if (size<=1) return;
+	
+	var rmax = (type&1)==0 ? 0.5*size : 0.353553*size;
+	for (var i = 0; i < fullH; i += size)
+		for (var j = 0; j < fullW; j += size) {
+			for (var dx = 0; dx < size; dx++)
+				for (var dy = 0; dy < size; dy++) {
+					var x = i + dx, y = j + dy, rx = dx - 0.5*size, ry = dy - 0.5*size;
+					if (x>=fullH || y>=fullW) break;
+					var d;
+					if ((type&1)==1) d = type==1? 0.707107*Math.abs(rx + ry) : 0.707107*Math.abs(rx - ry);
+					else d = type==0? Math.abs(rx) : Math.abs(ry);
+					if (d > rmax) d = 2*rmax - d;
+					var p = (x*fullW + y)<<2;
+					for (var k = 0; k < 3; k++) {
+						var r = (1 - Math.exp(Math.log(pxData[p|k]/255)*2.2)) * rmax;
+						var fill = d>0 ? d-r+0.5 : 1-2*r;
+						fill = fill<0 ? 0 : fill>1? 1 : fill;
+						// fill correction
+						if ((type&1)==0) {
+							if (d==rmax) fill = 2*fill-1;
+						}
+						else if (Math.abs(d-rmax)<0.5) {
+							if (size&1) fill = fill>0.5? fill : fill*1.414214-0.207107;
+							else fill = 5*fill-2*fill*fill-2; // 8*fill-4*fill*fill-3
+						}
+						// gamma correction
+						pxData[p|k] = Math.exp(Math.log(fill)*0.455)*255;
+					}
+				}
+		}
 	
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
 }

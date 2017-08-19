@@ -70,7 +70,7 @@ a{
 
 #imgspan{
 	position: absolute;
-    right: 280px;
+    right: 285px;
 	left: 0px;
 	height: 100%;
 	overflow: hidden;
@@ -90,7 +90,7 @@ a{
 }
 
 #ctrlspan{
-	width: 280px;
+	width: 285px;
 	height: 100%;
 	background-color: #303030;
 	margin: 0px;
@@ -143,8 +143,7 @@ a{
 }
 
 .applybuttom{
-	margin: 0px 16px;
-	padding: 0;
+	padding: 0px 16px;
 	float: right;
 	text-decoration: underline;
 	color: #808080;
