@@ -47,25 +47,23 @@ function resizeEffect(width, height, gamma=2.2) {
 	
 	for (var i = 0; i < height; i++)
 		for (var j = 0; j < width; j++) {
-			var lowH = i*ratioH, upH = (i+1)*ratioH;
-			var lowW = j*ratioW, upW = (j+1)*ratioW;
-			if (upH > originH+1) upH = originH+1;
-			if (upW > originW+1) upW = originW+1;
+			var lowH = i*ratioH, upH = i+1<height ? (i+1)*ratioH : originH+1;
+			var lowW = j*ratioW, upW = j+1<width ? (j+1)*ratioW : originW+1;
 			var totalR = 0, totalG = 0, totalB = 0, totalA = 0;
 			
 			for (var x = Math.floor(lowH); x < upH; x++)
 				for (var y = Math.floor(lowW); y < upW; y++) {
 					var a = 1, b = 1, pp = (x*originW + y)<<2;
-					if (lowH-x > 0) a -= lowH-x;
-					if (x+1-upH > 0) a -= x+1-upH;
-					if (lowW-y > 0) b -= lowW-y;
-					if (y+1-upW > 0) b -= y+1-upW;
-					totalR += a*b*tmpPxArr[pp];
-					totalG += a*b*tmpPxArr[pp|1];
-					totalB += a*b*tmpPxArr[pp|2];
-					totalA += a*b*tmpPxArr[pp|3];
+					if (lowH > x) a -= lowH-x;
+					if (x+1 > upH) a -= x+1-upH;
+					if (lowW > y) b -= lowW-y;
+					if (y+1 > upW) b -= y+1-upW;
+					var w = a*b;
+					totalR += w*tmpPxArr[pp];
+					totalG += w*tmpPxArr[pp|1];
+					totalB += w*tmpPxArr[pp|2];
+					totalA += w*tmpPxArr[pp|3];
 				}
-			
 			
 			var p = (i*width + j)<<2;
 			totalA += 0.00000001;

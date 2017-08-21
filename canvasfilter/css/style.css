@@ -102,10 +102,8 @@ a{
 
 #size{
 	position: absolute;
-	bottom: 0;
+	bottom: 12px;
 	left: 8px;
-	padding: 12px 8px 0px 0px;
-	height: 32px;
 }
 
 .sizebuttom{
@@ -131,6 +129,10 @@ a{
 
 .filterdiv{
 	width: 100%;
+	-webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .filtername{
