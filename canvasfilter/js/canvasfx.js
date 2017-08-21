@@ -47,8 +47,8 @@ function resizeEffect(width, height, gamma=2.2) {
 	
 	for (var i = 0; i < height; i++)
 		for (var j = 0; j < width; j++) {
-			var lowH = i*ratioH, upH = i+1<height ? (i+1)*ratioH : originH+1;
-			var lowW = j*ratioW, upW = j+1<width ? (j+1)*ratioW : originW+1;
+			var lowH = i*ratioH, upH = i+1<height ? (i+1)*ratioH : originH;
+			var lowW = j*ratioW, upW = j+1<width ? (j+1)*ratioW : originW;
 			var totalR = 0, totalG = 0, totalB = 0, totalA = 0;
 			
 			for (var x = Math.floor(lowH); x < upH; x++)
