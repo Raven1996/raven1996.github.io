@@ -35,7 +35,7 @@ function Panorama(viewerId, img) {
 		'        v = rot * vec3(sqrt(n) , 1.414214*y, 1.414214*x);\n' +
 		'    }\n' +
 		'    else if (type == 2) {\n' +
-		'        float theta = 2.0 * atan(length(vec2(y, x)), sqrt(1.0-y*y-x*x));\n' +
+		'        float theta = 2.0 * asin(length(vec2(y, x))/1.000001);\n' +
 		'        v = rot * vec3(cos(theta), d.y*sin(theta), d.x*sin(theta));\n' +
 		'    }\n' +
 		'    else if (type == 3) {\n' +
@@ -57,7 +57,7 @@ function Panorama(viewerId, img) {
 	programInit();
 	texObj = createTexture(img);
 	
-	var type = 0;  // 0:rectilinear 1:orthographic 2: 3:equidistant 4:stereographic
+	var type = 0;  // 0:108° rectilinear 1:180° orthographic 2:360° equisolid angle 3:360° equidistant 4:254° stereographic
 	var alpha = 0;  // z rotate
 	var beta = 0;  // y rotate
 	var speedA = 0;  // alpha speed
@@ -68,7 +68,7 @@ function Panorama(viewerId, img) {
 	
 	function webglInit() {
 		gl = myCanvas.getContext('webgl');
-		if (gl == null) alert('Your browser do not support WebGL!');
+		if (gl == null) alert('Your browser does not support WebGL!');
 	}
 	
 	function shaderInit(vsh, fsh) {
@@ -80,11 +80,11 @@ function Panorama(viewerId, img) {
 		gl.compileShader(fragmentShaderObject);
 		if (!gl.getShaderParameter(vertexShaderObject, gl.COMPILE_STATUS)) {
 			var info = gl.getShaderInfoLog(vertexShaderObject);
-			throw 'Could not compile vertex shader. \n\n' + info;
+			throw 'Could not compile vertex shader.\n' + info;
 		}
 		if (!gl.getShaderParameter(fragmentShaderObject, gl.COMPILE_STATUS)) {
 			var info = gl.getShaderInfoLog(fragmentShaderObject);
-			throw 'Could not compile fragment shader. \n\n' + info;
+			throw 'Could not compile fragment shader.\n' + info;
 		}
 	}
 	
@@ -96,7 +96,7 @@ function Panorama(viewerId, img) {
 		gl.linkProgram(programObject);
 		if (!gl.getProgramParameter(programObject, gl.LINK_STATUS)) {
 			var info = gl.getProgramInfoLog(programObject);
-			throw 'Could not link program. \n\n' + info;
+			throw 'Could not link program.\n' + info;
 		}
 		gl.useProgram(programObject);
 	}
