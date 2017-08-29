@@ -234,6 +234,7 @@ function Panorama(viewerId, img) {
 			}
 			break;
 		}
+		e.preventDefault();
 	}
 	
 	var my = {};
