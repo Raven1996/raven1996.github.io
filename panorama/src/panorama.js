@@ -200,7 +200,7 @@ function Panorama(viewerId, img) {
 		document.addEventListener('touchend', ontouch, false);
 	}
 	
-	function ontouch (event){  
+	function ontouch (event){
 		var e = event || window.event;
 		switch (e.type) {
 		case 'touchstart':
@@ -234,7 +234,6 @@ function Panorama(viewerId, img) {
 			}
 			break;
 		}
-		e.preventDefault();
 	}
 	
 	var my = {};

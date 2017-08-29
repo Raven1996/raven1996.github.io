@@ -2,7 +2,6 @@
 <html>
 <head lang="en">
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<title>Panorama Viewer</title>
 	<style type="text/css">
 		html{
@@ -41,6 +40,11 @@
 <script>
 	var panorama = null;
 	var type;
+	
+	document.body.addEventListener('touchmove', function (event) {
+		event.preventDefault();
+	}, false);
+	
 	window.onload = function() {
 		var viewer = document.getElementById('viewer');
 		viewer.width = document.body.clientWidth;
@@ -64,13 +68,12 @@
 		viewer.addEventListener('touchstart', touch, false);
 		document.addEventListener('touchmove', touch, false);
 		document.addEventListener('touchend', touch, false);
-		function touch (event){  
+		function touch (event){
 			var e = event || window.event;
 			if (e.type=="touchstart" && panorama && e.touches.length==2){  
 					type = type==4 ? 0 : type+1;
 					panorama.setType(type);
 			}
-			e.preventDefault();
 		}
 		viewer.ondragenter = function(e) {
 			// show something
