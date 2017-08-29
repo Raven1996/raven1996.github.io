@@ -43,7 +43,7 @@ function Panorama(viewerId, img) {
 		'    else if (type == 3) {\n' +
 		'        float theta = l * 3.141593;\n' +
 		'        if (l > 0.0) v = rot * vec3(cos(theta), n*sin(theta));\n' +
-		'        else v = rot * vec3(1.0, n);\n' +
+		'        else v = rot * vec3(0.3183099, n);\n' +
 		'    }\n' +
 		'    else if (type == 4) {\n' +
 		'        vec3 p = vec3(0.5, d) / (lq+0.25);\n' +
