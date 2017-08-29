@@ -24,8 +24,9 @@ function Panorama(viewerId, img) {
 		'uniform int type;\n' +
 		'void main() {\n' +
 		'    vec2 d = screenCoordinate.yx;\n' +
-		'    vec2 n = normalize(d);\n' +
 		'    float l = length(d);\n' +
+		'    vec2 n = vec2(0.0, 0.0);\n' + 
+		'    if (l > 0.0) n = normalize(d);\n' +
 		'    float lq = l * l;\n' +
 		'    vec3 v;\n' +		
 		'    if (type == 0) v = rot * vec3(0.7265425, d);\n' +
