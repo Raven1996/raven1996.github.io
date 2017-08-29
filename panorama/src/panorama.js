@@ -227,7 +227,7 @@ function Panorama(viewerId, img) {
 			}
 			break;
 		case 'touchend':
-			if (hold && e.touches.length==0) {
+			if (hold) {
 				var touches = e.changedTouches;
 				for (var i=0; i<touches.length; i++){
 					if (touches[i].identifier == idt) {
