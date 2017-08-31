@@ -27,7 +27,7 @@ function Panorama(viewerId, img) {
 		'    vec2 n = normalize(d);\n' +
 		'    float lq = l * l;\n' +
 		'    vec3 v;\n' +		
-		'    if (type == 0) v = rot * normalize(vec3(1.0, d*1.376382));\n' +
+		'    if (type == 0) v = rot * vec3(1.0, d*1.376382);\n' +
 		'    else if (type == 1) {\n' +
 		'        float m = 1.0 - 2.0 * lq;\n' +
 		'        if (m < 0.0) discard;\n' +
@@ -48,7 +48,7 @@ function Panorama(viewerId, img) {
 		'        v = rot * (p-vec3(1.0, 0.0, 0.0));\n' +
 		'    }\n' +
 		'    else discard;\n' +
-		'    vec2 coord = vec2(atan(v.z, v.x)*0.1591549+0.5, -asin(clamp(v.y, -1.0, 1.0))*0.3183099+0.5);\n' +
+		'    vec2 coord = vec2(atan(v.z, v.x)*0.1591549+0.5, -atan(v.y, length(v.zx))*0.3183099+0.5);\n' +
 		'    gl_FragColor = texture2D(imageTexture, coord);\n' +
 		'}';
 	var myObj = {};
