@@ -1,4 +1,4 @@
-function Panorama(viewerId, img) {
+function PanoramaEarth(viewerId, imgday, imgnight) {
 	var gl = null;
 	var myCanvas = document.getElementById(viewerId);
 	var vertexShaderObject;
@@ -18,55 +18,47 @@ function Panorama(viewerId, img) {
 	var fsh =
 		'precision mediump float;\n' +
 		'varying vec2 screenCoordinate;\n' +
-		'uniform sampler2D imageTexture;\n' +
+		'uniform sampler2D dayTexture;\n' +
+		'uniform sampler2D nightTexture;\n' +
 		'uniform mat3 rot;\n' +
-		'uniform int type;\n' +
+		'uniform vec3 sun;\n' +
 		'void main() {\n' +
 		'    vec2 d = screenCoordinate.yx;\n' +
 		'    float l = length(d);\n' +
-		'    vec2 n = normalize(d);\n' +
-		'    float lq = l * l;\n' +
-		'    vec3 v;\n' +		
-		'    if (type == 0) v = rot * vec3(1.0, d*1.376382);\n' +
-		'    else if (type == 1) {\n' +
-		'        float m = 1.0 - 2.0 * lq;\n' +
-		'        if (m < 0.0) discard;\n' +
-		'        v = rot * vec3(sqrt(m), d*1.414214);\n' +
-		'    }\n' +
-		'    else if (type == 2) {\n' +
-		'        float lb = sqrt(1.0-lq) * l * 2.0;\n' +
-		'        if (l > 0.0) v = rot * vec3(1.0-2.0*lq, n*lb);\n' +
-		'        else v = rot * vec3(1.0, d*2.0);\n' +
-		'    }\n' +
-		'    else if (type == 3) {\n' +
-		'        float t = l * 3.141593;\n' +
-		'        if (l > 0.0) v = rot * vec3(cos(t), n*sin(t));\n' +
-		'        else v = rot * vec3(1.0, d*3.141593);\n' +
-		'    }\n' +
-		'    else if (type == 4) {\n' +
-		'        vec3 p = vec3(0.5, d) / (lq + 0.25);\n' +
-		'        v = rot * (p-vec3(1.0, 0.0, 0.0));\n' +
-		'    }\n' +
-		'    else discard;\n' +
+		'    float m = 1.0 - 2.0 * l * l;\n' +
+		'    if (m < 0.0) discard;\n' +
+		'    vec3 v = rot * vec3(sqrt(m), d*1.414214);\n' +
+		'    float t = dot(v, sun);\n' +
 		'    vec2 coord = vec2(atan(v.z, v.x)*0.1591549+0.5, -atan(v.y, length(v.zx))*0.3183099+0.5);\n' +
-		'    gl_FragColor = texture2D(imageTexture, coord);\n' +
+		'    vec3 dayColor = texture2D(dayTexture, coord).rgb;\n' +
+		'    vec3 nightColor = texture2D(nightTexture, coord).rgb;\n' +
+		'    if (t >= 0.1) gl_FragColor.rgb = sqrt(dayColor*dayColor*(0.1+t));\n' +
+		'    else if (t <= 0.0) gl_FragColor.rgb = nightColor;\n' +
+		'    else gl_FragColor.rgb = sqrt(dayColor*dayColor*2.0*t+nightColor*nightColor*(1.0-10.0*t));\n' +
 		'}';
+		
+		//'    if (t >= 0.1) gl_FragColor.rgb = sqrt(0.1+t) * dayColor;\n' +
+		//'    else if (t <= 0.0) gl_FragColor.rgb = nightColor;\n' +
+		//'    else gl_FragColor.rgb = sqrt(2.0*t) * dayColor + (1-sqrt(10.0*t)) * nightColor;\n' +
 	var myObj = {};
 	
 	webglInit();
 	shaderInit(vsh, fsh);
 	programInit();
-	createTexture(img);
+	createTexture(imgday, imgnight);
 	
-	var type = 0;  // 0:108° rectilinear 1:180° orthographic 2:360° equisolid angle 3:360° equidistant 4:254° stereographic
-	var alpha = 0;  // z rotate
+	var alpha = 0.524;  // z rotate
 	var beta = 0;  // y rotate
 	var speedA = 0;  // alpha speed
-	var speedB = 0;  // beta speed
+	var speedB = -0.001;  // beta speed
 	var hold = false;  // mouse down or touch
 	var lastx = 0, lasty = 0, nowx = 0, nowy = 0;  // position
 	var time = 0;  // timestamp
 	var idt;  // touch identifier
+	var sunDirection = [0.9175234, 0.3976818, 0.0];  // sun Direction
+	var itv = setInterval(function(){
+		//sin = 0.3976818;
+	}, 60000);
 	
 	var oldmousedown;
 	var oldmousemove;
@@ -107,11 +99,19 @@ function Panorama(viewerId, img) {
 		gl.useProgram(programObject);
 	}
 	
-	function createTexture(imgObj) {
+	function createTexture(imgday, imgnight) {
 		gl.activeTexture(gl.TEXTURE0);
-		var textureObject = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, textureObject);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgObj);
+		var texture0 = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, texture0);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgday);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.activeTexture(gl.TEXTURE1);
+		var texture1 = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, texture1);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgnight);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -146,8 +146,9 @@ function Panorama(viewerId, img) {
 			-sa*cb, ca,-sa*sb,
 			-sb, 0, cb];
 		gl.uniformMatrix3fv(myObj.matrix, false, rot);
-		gl.uniform1i(myObj.texture, 0);
-		gl.uniform1i(myObj.type, type);
+		gl.uniform1i(myObj.texture0, 0);
+		gl.uniform1i(myObj.texture1, 1);
+		gl.uniform3fv(myObj.sun, sunDirection);
 		gl.clearColor(0.0, 0.0, 0.0, 0.0);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -170,8 +171,9 @@ function Panorama(viewerId, img) {
 		myObj.ratiox = gl.getUniformLocation(programObject, "ratiox");
 		myObj.ratioy = gl.getUniformLocation(programObject, "ratioy");
 		myObj.matrix = gl.getUniformLocation(programObject, "rot");
-		myObj.texture = gl.getUniformLocation(programObject, "imageTexture");
-		myObj.type = gl.getUniformLocation(programObject, "type");
+		myObj.texture0 = gl.getUniformLocation(programObject, "dayTexture");
+		myObj.texture1 = gl.getUniformLocation(programObject, "nightTexture");
+		myObj.sun = gl.getUniformLocation(programObject, "sun");
 		myObj.animation = requestAnimationFrame(draw);
 		oldmousedown = myCanvas.onmousedown;
 		oldmousemove = document.oldmousemove;
@@ -242,6 +244,7 @@ function Panorama(viewerId, img) {
 	}
 	my.stop = function() {
 		cancelAnimationFrame(myObj.animation);
+		clearInterval(itv);
 		myCanvas.onmousedown = oldmousedown;
 		document.onmousemove = oldmousemove;
 		document.onmouseup = oldmouseup;
@@ -249,9 +252,6 @@ function Panorama(viewerId, img) {
 		document.removeEventListener('touchmove', ontouch, false);
 		document.removeEventListener('touchend', ontouch, false);
 		gl.finish;
-	}
-	my.setType = function(num){
-		type = num;
 	}
 	return my;
 }
