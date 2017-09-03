@@ -62,7 +62,7 @@ function PanoramaEarth(viewerId, imgday, imgnight) {
 	
 	function getDirection() {
 		var myDate = new Date();
-		var t = myDate.getTime() / 86400000
+		var t = myDate.getTime() / 86400000;
 		var d = (t-Math.floor(t)) * 6.283185;
 		t = t / 365.2422;
 		t = t - Math.floor(t) - 0.4722; //summer
