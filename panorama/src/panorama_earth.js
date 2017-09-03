@@ -32,9 +32,9 @@ function PanoramaEarth(viewerId, imgday, imgnight) {
 		'    vec2 coord = vec2(atan(v.z, v.x)*0.1591549+0.5, -atan(v.y, length(v.zx))*0.3183099+0.5);\n' +
 		'    vec3 dayColor = texture2D(dayTexture, coord).rgb;\n' +
 		'    vec3 nightColor = texture2D(nightTexture, coord).rgb;\n' +
-		'    if (t >= 0.1) gl_FragColor.rgb = sqrt(dayColor*dayColor*(0.1+t));\n' +
-		'    else if (t <= 0.0) gl_FragColor.rgb = nightColor;\n' +
-		'    else gl_FragColor.rgb = sqrt(dayColor*dayColor*2.0*t+nightColor*nightColor*(1.0-10.0*t));\n' +
+		'    if (t >= 0.1) gl_FragColor = vec4(sqrt(dayColor*dayColor*(0.1+t)), 1.0);\n' +
+		'    else if (t <= 0.0) gl_FragColor = vec4(nightColor, 1.0);\n' +
+		'    else gl_FragColor = vec4(sqrt(dayColor*dayColor*2.0*t+nightColor*nightColor*(1.0-10.0*t)), 1.0);\n' +
 		'}';
 	
 	var myObj = {};
