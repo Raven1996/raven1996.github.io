@@ -36,10 +36,7 @@ function PanoramaEarth(viewerId, imgday, imgnight) {
 		'    else if (t <= 0.0) gl_FragColor.rgb = nightColor;\n' +
 		'    else gl_FragColor.rgb = sqrt(dayColor*dayColor*2.0*t+nightColor*nightColor*(1.0-10.0*t));\n' +
 		'}';
-		
-		//'    if (t >= 0.1) gl_FragColor.rgb = sqrt(0.1+t) * dayColor;\n' +
-		//'    else if (t <= 0.0) gl_FragColor.rgb = nightColor;\n' +
-		//'    else gl_FragColor.rgb = sqrt(2.0*t) * dayColor + (1-sqrt(10.0*t)) * nightColor;\n' +
+	
 	var myObj = {};
 	
 	webglInit();
@@ -55,14 +52,25 @@ function PanoramaEarth(viewerId, imgday, imgnight) {
 	var lastx = 0, lasty = 0, nowx = 0, nowy = 0;  // position
 	var time = 0;  // timestamp
 	var idt;  // touch identifier
-	var sunDirection = [0.9175234, 0.3976818, 0.0];  // sun Direction
-	var itv = setInterval(function(){
-		//sin = 0.3976818;
-	}, 60000);
+	var sunDirection = [0.0, 0.0, 0.0];  // sun Direction
+	getDirection();
+	var itv = setInterval(getDirection, 60000);
 	
 	var oldmousedown;
 	var oldmousemove;
 	var oldmouseup;
+	
+	function getDirection() {
+		var myDate = new Date();
+		var t = myDate.getTime() / 86400000
+		var d = (t-Math.floor(t)) * 6.283185;
+		t = t / 365.2422;
+		t = t - Math.floor(t) - 0.4722; //summer
+		sunDirection[1] = 0.3977 * Math.cos(t*6.283185);
+		r = Math.sqrt(1-sunDirection[1]*sunDirection[1]);
+		sunDirection[0] = -r * Math.cos(d);
+		sunDirection[2] = r * Math.sin(d);
+	}
 	
 	function webglInit() {
 		gl = myCanvas.getContext('webgl');
