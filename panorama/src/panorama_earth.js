@@ -1,9 +1,9 @@
 function PanoramaEarth(viewerId, imgday, imgnight) {
 	var gl = null;
 	var myCanvas = document.getElementById(viewerId);
-	var vertexShaderObject;
+	var vertexShaderObject = null;
 	var fragmentShaderObject = null;
-	var programObject;
+	var programObject = null;
 	var v4PositionIndex;
 	var vsh =
 		'precision mediump float;\n' +
@@ -259,7 +259,7 @@ function PanoramaEarth(viewerId, imgday, imgnight) {
 		viewer.removeEventListener('touchstart', ontouch, false);
 		document.removeEventListener('touchmove', ontouch, false);
 		document.removeEventListener('touchend', ontouch, false);
-		gl.finish;
+		gl.disableVertexAttribArray(v4PositionIndex);
 	}
 	return my;
 }
