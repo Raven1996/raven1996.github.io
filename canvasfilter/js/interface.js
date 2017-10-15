@@ -19,7 +19,7 @@ window.onload = function(){
 				canvasB.setAttribute('width', image.width)
 				canvasB.setAttribute('height', image.height)
 				ctxA.drawImage(image, 0, 0)
-				for (var i=0; i<13; i++) resetValues(i)
+				for (var i=0; i<14; i++) resetValues(i)
 				clickIndex(-1)
 				noEffect()
 				setScaleType(1)
@@ -105,7 +105,7 @@ function importFile(file){
 			ctxA.clearRect(0, 0, this.width, this.height)
 			ctxA.drawImage(this, 0, 0)
 			delete this
-			for (var i=0; i<13; i++) resetValues(i)
+			for (var i=0; i<14; i++) resetValues(i)
 			clickIndex(-1)
 			noEffect()
 			setScaleType(1)
@@ -226,6 +226,9 @@ function resetValues(index){
 		case 12:
 			div[0].value="6"
 			div[1].value="1"
+			break
+		case 13:
+			div[0].value="0"
 			break
 	}
 }
@@ -388,13 +391,14 @@ function previewCanvas(index){
 			break
 		case 11:
 			dotEffect(parseInt(div[0].value),
-				parseInt(div[1].value)
-				)
+				parseInt(div[1].value))
 			break
 		case 12:
 			lineEffect(parseInt(div[0].value),
-				parseInt(div[1].value)
-				)
+				parseInt(div[1].value))
+			break
+		case 13:
+			fxaaEffect(parseInt(div[0].value))
 			break
 	}
 	scaleCanvas()

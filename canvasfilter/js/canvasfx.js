@@ -36,7 +36,7 @@ function resizeEffect(width, height, gamma=2.2) {
 	
 	for (var i = 0; i < originH; i++)
 		for (var j = 0; j < originW; j++) {
-			var p = (i*originW + j)<<2;
+			var p = i*originW + j<<2;
 			tmpPxArr[p|3] = pxDataA[p|3] / 255;
 			tmpPxArr[p] = Math.exp(Math.log(pxDataA[p]/255) * gamma) * tmpPxArr[p|3];
 			tmpPxArr[p|1] = Math.exp(Math.log(pxDataA[p|1]/255) * gamma) * tmpPxArr[p|3];
@@ -53,7 +53,7 @@ function resizeEffect(width, height, gamma=2.2) {
 			
 			for (var x = Math.floor(lowH); x < upH; x++)
 				for (var y = Math.floor(lowW); y < upW; y++) {
-					var a = 1, b = 1, pp = (x*originW + y)<<2;
+					var a = 1, b = 1, pp = x*originW + y<<2;
 					if (lowH > x) a -= lowH-x;
 					if (x+1 > upH) a -= x+1-upH;
 					if (lowW > y) b -= lowW-y;
@@ -65,7 +65,7 @@ function resizeEffect(width, height, gamma=2.2) {
 					totalA += w*tmpPxArr[pp|3];
 				}
 			
-			var p = (i*width + j)<<2;
+			var p = i*width + j<<2;
 			totalA += 0.00000001;
 			pxDataB[p] = Math.exp(Math.log(totalR/totalA) * gamma) * 255;
 			pxDataB[p|1] = Math.exp(Math.log(totalG/totalA) * gamma) * 255;
@@ -88,55 +88,55 @@ function greyEffect(type=0) {
 		var r = pxData[i<<2];
 		var g = pxData[i<<2|1];
 		var b = pxData[i<<2|2];
-		pxData[i<<2] = pxData[i<<2|1] = pxData[i<<2|2] = type == 0 ? (r*38 + g*75 + b*15) >> 7 : (r + g + b) /3;
+		pxData[i<<2] = pxData[i<<2|1] = pxData[i<<2|2] = type == 0 ? r*38 + g*75 + b*15 >> 7 : (r + g + b) /3;
 	}
 
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
 }
 
-function hue2rgb(p, q, t) {
-	t -= Math.floor(t);
-	if (t < 1/6) return p + (q - p) * 6 * t;
-	if (t < 0.5) return q;
-	if (t < 2/3) return p + (q - p) * (4 - 6 * t);
-	return p;
-}
 
-function hslToRgb(h, s, l) {
-	var r, g, b;
-	if (s == 0) {
-		r = g = b = l;  // achromatic
-	} else {
-		if (s > 1) s = 1;
-		var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-		var p = 2 * l - q;
-		r = hue2rgb(p, q, h + 1/3);
-		g = hue2rgb(p, q, h);
-		b = hue2rgb(p, q, h - 1/3);
-	}
-	return [r*255, g*255, b*255];
-}
-
-function rgbToHsl(r, g, b) {
-	r /= 255, g /= 255, b /= 255;
-	var max = Math.max(r, g, b), min = Math.min(r, g, b);
-	var h, s, l = (max+min) * 0.5;
-	if (max == min) {
-		h = s = 0;  // achromatic
-	} else {
-		var d = max - min;
-		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-		switch(max) {
-		case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-		case g: h = (b - r) / d + 2; break;
-		case b: h = (r - g) / d + 4;
-		}
-		h /= 6;
-	}
-	return [h, s, l];
-}
 
 function hslEffect(degreeH=0, percentS=0, percentL=0) {
+	function hue2rgb(p, q, t) {
+		t -= Math.floor(t);
+		if (t < 1/6) return p + (q - p) * 6 * t;
+		if (t < 0.5) return q;
+		if (t < 2/3) return p + (q - p) * (4 - 6 * t);
+		return p;
+	}
+	function hslToRgb(h, s, l) {
+		var r, g, b;
+		if (s == 0) {
+			r = g = b = l;  // achromatic
+		} else {
+			if (s > 1) s = 1;
+			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+			var p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1/3);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1/3);
+		}
+		return [r*255, g*255, b*255];
+	}
+	function rgbToHsl(r, g, b) {
+		r /= 255, g /= 255, b /= 255;
+		var max = Math.max(r, g, b), min = Math.min(r, g, b);
+		var h, s, l = (max+min) * 0.5;
+		if (max == min) {
+			h = s = 0;  // achromatic
+		} else {
+			var d = max - min;
+			s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+			switch(max) {
+			case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+			case g: h = (b - r) / d + 2; break;
+			case b: h = (r - g) / d + 4;
+			}
+			h /= 6;
+		}
+		return [h, s, l];
+	}
+	
 	canvasB.width = canvasA.width;
 	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
@@ -181,7 +181,7 @@ function motionHarrisEffect(length, degree, mask=0, centerX=0.5, centerY=0.5) { 
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			pxArr[p|3] = pxData[p|3] / 255;
 			pxArr[p] = Math.exp(Math.log(pxData[p]/255)*2.2) * pxArr[p|3];
 			pxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255)*2.2) * pxArr[p|3];
@@ -232,13 +232,13 @@ function motionHarrisEffect(length, degree, mask=0, centerX=0.5, centerY=0.5) { 
 				var y_ = y == fullW-1 ? y-1 : Math.floor(y);
 				var kx0=x-x_, kx1=1-kx0, ky0=y-y_, ky1=1-ky0;
 
-				tmpRGB[k] += pxArr[((x_*fullW + y_)<<2)|k]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)|k]*kx1*ky0;
-				tmpRGB[k] += pxArr[(((x_+1)*fullW + y_)<<2)|k]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)|k]*kx0*ky0;
-				tmpA[k] += pxArr[((x_*fullW + y_)<<2)|3]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)|3]*kx1*ky0;
-				tmpA[k] += pxArr[(((x_+1)*fullW + y_)<<2)|3]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)|3]*kx0*ky0;
+				tmpRGB[k] += pxArr[x_*fullW + y_<<2|k]*kx1*ky1 + pxArr[x_*fullW + y_+1<<2|k]*kx1*ky0;
+				tmpRGB[k] += pxArr[(x_+1)*fullW + y_<<2|k]*kx0*ky1 + pxArr[(x_+1)*fullW + y_+1<<2|k]*kx0*ky0;
+				tmpA[k] += pxArr[x_*fullW + y_<<2|3]*kx1*ky1 + pxArr[x_*fullW + y_+1<<2|3]*kx1*ky0;
+				tmpA[k] += pxArr[(x_+1)*fullW + y_<<2|3]*kx0*ky1 + pxArr[(x_+1)*fullW + y_+1<<2|3]*kx0*ky0;
 			}
 			
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			pxData[p] = Math.exp(Math.log(tmpRGB[0]/(tmpA[0]+0.00000001))*0.455) * 255;
 			pxData[p|1] = Math.exp(Math.log(tmpRGB[1]/(tmpA[1]+0.00000001))*0.455) * 255;
 			pxData[p|2] = Math.exp(Math.log(tmpRGB[2]/(tmpA[2]+0.00000001))*0.455) * 255;
@@ -268,7 +268,7 @@ function zoomHarrisEffect(strength, centerX=0.5, centerY=0.5) {  // Harris camer
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			pxArr[p|3] = pxData[p|3] / 255;
 			pxArr[p] = Math.exp(Math.log(pxData[p]/255)*2.2) * pxArr[p|3];
 			pxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255)*2.2) * pxArr[p|3];
@@ -309,13 +309,13 @@ function zoomHarrisEffect(strength, centerX=0.5, centerY=0.5) {  // Harris camer
 				var y_ = y == fullW-1 ? y-1 : Math.floor(y);
 				var kx0=x-x_, kx1=1-kx0, ky0=y-y_, ky1=1-ky0;
 
-				tmpRGB[k] += pxArr[((x_*fullW + y_)<<2)|k]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)|k]*kx1*ky0;
-				tmpRGB[k] += pxArr[(((x_+1)*fullW + y_)<<2)|k]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)|k]*kx0*ky0;
-				tmpA[k] += pxArr[((x_*fullW + y_)<<2)|3]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)|3]*kx1*ky0;
-				tmpA[k] += pxArr[(((x_+1)*fullW + y_)<<2)|3]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)|3]*kx0*ky0;
+				tmpRGB[k] += pxArr[x_*fullW + y_<<2|k]*kx1*ky1 + pxArr[x_*fullW + y_+1<<2|k]*kx1*ky0;
+				tmpRGB[k] += pxArr[(x_+1)*fullW + y_<<2|k]*kx0*ky1 + pxArr[(x_+1)*fullW + y_+1<<2|k]*kx0*ky0;
+				tmpA[k] += pxArr[x_*fullW + y_<<2|3]*kx1*ky1 + pxArr[x_*fullW + y_+1<<2|3]*kx1*ky0;
+				tmpA[k] += pxArr[(x_+1)*fullW + y_<<2|3]*kx0*ky1 + pxArr[(x_+1)*fullW + y_+1<<2|3]*kx0*ky0;
 			}
 			
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			pxData[p] = Math.exp(Math.log(tmpRGB[0]/(tmpA[0]+0.00000001))*0.455) * 255;
 			pxData[p|1] = Math.exp(Math.log(tmpRGB[1]/(tmpA[1]+0.00000001))*0.455) * 255;
 			pxData[p|2] = Math.exp(Math.log(tmpRGB[2]/(tmpA[2]+0.00000001))*0.455) * 255;
@@ -337,7 +337,7 @@ function distortionEffect(strength) {  // recommend strength from -0.5 to 0.5
 
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			pxArr[p|3] = pxData[p|3] / 255;
 			pxArr[p] = Math.exp(Math.log(pxData[p]/255)*2.2) * pxArr[p|3];
 			pxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255)*2.2) * pxArr[p|3];
@@ -355,11 +355,11 @@ function distortionEffect(strength) {  // recommend strength from -0.5 to 0.5
 			var y_ = y == fullW-1 ? y-1 : Math.floor(y);
 			var kx0=x-x_, kx1=1-kx0, ky0=y-y_, ky1=1-ky0;
 			for (var k = 0; k < 4; k++) {
-				tmpRGBA[k] += pxArr[((x_*fullW + y_)<<2)|k]*kx1*ky1 + pxArr[((x_*fullW + y_+1)<<2)|k]*kx1*ky0;
-				tmpRGBA[k] += pxArr[(((x_+1)*fullW + y_)<<2)|k]*kx0*ky1 + pxArr[(((x_+1)*fullW + y_+1)<<2)|k]*kx0*ky0;
+				tmpRGBA[k] += pxArr[x_*fullW + y_<<2|k]*kx1*ky1 + pxArr[x_*fullW + y_+1<<2|k]*kx1*ky0;
+				tmpRGBA[k] += pxArr[(x_+1)*fullW + y_<<2|k]*kx0*ky1 + pxArr[(x_+1)*fullW + y_+1<<2|k]*kx0*ky0;
 			}
 			
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			tmpRGBA[3] += 0.00000001;
 			pxData[p] = Math.exp(Math.log(tmpRGBA[0]/(tmpRGBA[3]))*0.455) * 255;
 			pxData[p|1] = Math.exp(Math.log(tmpRGBA[1]/(tmpRGBA[3]))*0.455) * 255;
@@ -424,7 +424,7 @@ function normalBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, center
 				case 2: wt = Math.exp(-dx * dx * sigma2);
 				}
 				if (wt < 0) continue;
-				var pp = (x*fullW + j)<<2;
+				var pp = x*fullW + j<<2;
 				totalR += pxArr[pp] * wt;
 				totalG += pxArr[pp|1] * wt;
 				totalB += pxArr[pp|2] * wt;
@@ -457,7 +457,7 @@ function normalBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, center
 				case 2: wt = Math.exp(-dy * dy * sigma2);
 				}
 				if (wt < 0) continue;
-				var pp = (i*fullW + y)<<2;
+				var pp = i*fullW + y<<2;
 				totalR += tmpPxArr[pp] * wt;
 				totalG += tmpPxArr[pp|1] * wt;
 				totalB += tmpPxArr[pp|2] * wt;
@@ -496,7 +496,7 @@ function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = i*fullW + j << 2;
+			var p = i*fullW + j<<2;
 			var ratio = 0;
 			switch(mask) {
 			case 0: ratio = 1; break;  // none
@@ -525,11 +525,11 @@ function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=
 			for (var k = 0; k < 4; k++) {
 				var accum = [0];
 				for (var j = 0; j < fullW; j++) {
-					var p = i*fullW + j << 2;
+					var p = i*fullW + j<<2;
 					accum[j+1] = accum[j] + pxArr[p|k];
 				}
 				for (var j = 0; j < fullW; j++) {
-					var p = i*fullW + j << 2;
+					var p = i*fullW + j<<2;
 					var j0 = ij[p|2], j1 = ij[p|3], j0_= Math.floor(j0), j1_=Math.floor(j1);
 					tmpPxArr[p|k] = (j1_+1-j1)*accum[j1_] + (j1-j1_)*accum[j1_+1] - (j0_+1-j0)*accum[j0_] - (j0-j0_)*accum[j0_+1];
 					tmpPxArr[p|k] /= j1 - j0;
@@ -541,11 +541,11 @@ function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=
 			for (var k = 0; k < 4; k++) {
 				var accum = [0];
 				for (var i = 0; i < fullH; i++) {
-					var p = i*fullW + j << 2;
+					var p = i*fullW + j<<2;
 					accum[i+1] = accum[i] + tmpPxArr[p|k];
 				}
 				for (var i = 0; i < fullH; i++) {
-					var p = i*fullW + j << 2;
+					var p = i*fullW + j<<2;
 					var i0 = ij[p], i1 = ij[p|1], i0_= Math.floor(i0), i1_=Math.floor(i1);
 					pxArr[p|k] = (i1_+1-i1)*accum[i1_] + (i1-i1_)*accum[i1_+1] - (i0_+1-i0)*accum[i0_] - (i0-i0_)*accum[i0_+1];
 					pxArr[p|k] /= i1 - i0;
@@ -556,7 +556,7 @@ function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=
 	
 	for (var i = 0; i < fullH; i++)
 			for (var j = 0; j < fullW; j++) {
-				var p = i*fullW + j << 2;
+				var p = i*fullW + j<<2;
 				pxArr[p|3] += 0.00000001;
 				pxData[p] = Math.exp(Math.log(pxArr[p]/pxArr[p|3]) * gamma) * 255;
 				pxData[p|1] = Math.exp(Math.log(pxArr[p|1]/pxArr[p|3]) * gamma) * 255;
@@ -599,7 +599,7 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			tmpPxArr[p|3] = pxData[p|3] / 255;
 			tmpPxArr[p] = Math.exp(Math.log(pxData[p]/255) * gamma) * tmpPxArr[p|3];
 			tmpPxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255) * gamma) * tmpPxArr[p|3];
@@ -618,7 +618,7 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 			case 3: ratio = Math.abs(j-centerX)*halfW_Re;  // vertical
 			}
 			var blurR = radius * ratio + 1;
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0;
 			var blurR_x = Math.floor(blurR);
 			var xbegin = i-blurR_x>=0 ? -blurR_x : -i, xend = i+blurR_x<fullH ? blurR_x : fullH-i-1;
@@ -630,7 +630,7 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 				for (var dy = ybegin; dy <= yend; dy++) {
 					var wt = Math.abs(dy) <= wt1y ? 1 : blurR - Math.sqrt(dx*dx + dy*dy);  // to make a soft edge
 					// blurR - fastSqrt(dx*dx + dy*dy)
-					var pp = ((i+dx)*fullW + j+dy)<<2  ;
+					var pp = (i+dx)*fullW + j+dy<<2  ;
 					totalR += tmpPxArr[pp] * wt;
 					totalG += tmpPxArr[pp|1] * wt;
 					totalB += tmpPxArr[pp|2] * wt;
@@ -649,7 +649,7 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 }
 
 /*	
-	// a circle random method just for referring
+	// a circle random method just for reference
 	var r = Math.pow(Math.random(),0.5) * radius;
 	var theta = Math.random()*2*Math.PI;
 	var dx = Math.cos(theta)*r;
@@ -687,7 +687,7 @@ function motionBlurEffect(length, degree, gamma=2.2, mask=0, centerX=0.5, center
 
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			tmpPxArr[p|3] = pxData[p|3] / 255;
 			tmpPxArr[p] = Math.exp(Math.log(pxData[p]/255) * gamma) * tmpPxArr[p|3];
 			tmpPxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255) * gamma) * tmpPxArr[p|3];
@@ -706,7 +706,7 @@ function motionBlurEffect(length, degree, gamma=2.2, mask=0, centerX=0.5, center
 			case 3: ratio = Math.abs(j-centerX)*halfW_Re;  // vertical
 			}
 			var blurR = length * ratio * ratioR;
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0;
 			blurR = Math.abs(blurR) + 1;
 			var blurR_ = Math.floor(blurR);
@@ -719,14 +719,14 @@ function motionBlurEffect(length, degree, gamma=2.2, mask=0, centerX=0.5, center
 						var p1, p2, l1, l2;
 						if (ratioX > ratioY) {
 							var y_ = Math.floor(y);
-							p1 = (x*fullW + y_)<<2 ;
+							p1 = x*fullW + y_<<2 ;
 							p2 = p1 + 4;
 							l2 = y - y_;
 							l1 = 1 - l2;
 						} else {
 							var x_ = Math.floor(x);
-							p1 = (x_*fullW + y)<<2;
-							p2 = ((x_+1)*fullW + y)<<2;
+							p1 = x_*fullW + y<<2;
+							p2 = (x_+1)*fullW + y<<2;
 							l2 = x - x_;
 							l1 = 1 - l2;
 						}
@@ -769,7 +769,7 @@ function zoomBlurEffect(strength, gamma=2.2, type=0, centerX=0.5, centerY=0.5) {
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			tmpPxArr[p|3] = pxData[p|3] / 255;
 			tmpPxArr[p] = Math.exp(Math.log(pxData[p]/255) * gamma) * tmpPxArr[p|3];
 			tmpPxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255) * gamma) * tmpPxArr[p|3];
@@ -782,7 +782,7 @@ function zoomBlurEffect(strength, gamma=2.2, type=0, centerX=0.5, centerY=0.5) {
 		for (var j = 0; j < fullW; j++) {
 			var zoomX = (centerY-i) * strength, zoomY = (centerX-j) * strength;
 			var zoomX_ = Math.abs(zoomX), zoomY_ = Math.abs(zoomY);
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			if (zoomX_==0 && zoomY_==0) {
 				tmpPxArr[p|3] += 0.00000001;
 				pxData[p] = Math.exp(Math.log(tmpPxArr[p]/tmpPxArr[p|3]) * gamma) * 255;
@@ -815,14 +815,14 @@ function zoomBlurEffect(strength, gamma=2.2, type=0, centerX=0.5, centerY=0.5) {
 					var p1, p2, l1, l2;
 					if (Math.abs(ratioX) > Math.abs(ratioY)) {
 						var y_ = Math.floor(y);
-						p1 = (x*fullW + y_)<<2 ;
+						p1 = x*fullW + y_<<2 ;
 						p2 = p1 + 4;
 						l2 = y - y_;
 						l1 = 1 - l2;
 					} else {
 						var x_ = Math.floor(x);
-						p1 = (x_*fullW + y)<<2;
-						p2 = ((x_+1)*fullW + y)<<2;
+						p1 = x_*fullW + y<<2;
+						p2 = (x_+1)*fullW + y<<2;
 						l2 = x - x_;
 						l1 = 1 - l2;
 					}
@@ -886,7 +886,7 @@ function mosaicEffect(size, gamma=2.2, type=0) {
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var p = (i*fullW + j)<<2;
+			var p = i*fullW + j<<2;
 			tmpPxArr[p|3] = pxData[p|3] / 255;
 			tmpPxArr[p] = Math.exp(Math.log(pxData[p]/255) * gamma) * tmpPxArr[p|3];
 			tmpPxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255) * gamma) * tmpPxArr[p|3];
@@ -904,7 +904,7 @@ function mosaicEffect(size, gamma=2.2, type=0) {
 					var x = i + dx;
 					var y = j + dy;
 					if (x >= 0 && x < fullH && y >= 0 && y < fullW) {
-						var p = (x*fullW + y)<<2;
+						var p = x*fullW + y<<2;
 						totalR += tmpPxArr[p];
 						totalG += tmpPxArr[p|1];
 						totalB += tmpPxArr[p|2];
@@ -921,7 +921,7 @@ function mosaicEffect(size, gamma=2.2, type=0) {
 				for (var dy = 0; dy < size; dy++) {
 					var x = i + dx, y = j + dy;
 					if (x >= 0 && x < fullH && y >= 0 && y < fullW) {
-						var p = (x*fullW + y)<<2;
+						var p = x*fullW + y<<2;
 						pxData[p] = resR;
 						pxData[p|1] = resG;
 						pxData[p|2] = resB;
@@ -938,7 +938,6 @@ function dotEffect(size, type=0) {
 	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
-	var tmpPxArr = [];
 	var fullH = canvasB.height, fullW = canvasB.width;
 	if (size<=1) return;
 	
@@ -955,7 +954,7 @@ function dotEffect(size, type=0) {
 							ry = rmax - ry;
 						}
 						var d = Math.sqrt(rx*rx + ry*ry);
-						var p = (x*fullW + y)<<2;
+						var p = x*fullW + y<<2;
 						for (var k = 0; k < 3; k++) {
 							var tmp = pxData[p|k]/255
 							var r = ((((-4*tmp+6)*tmp-2.8)*tmp-0.2)*tmp+1) * rmax;  // a quadratic fitting curve
@@ -978,7 +977,7 @@ function dotEffect(size, type=0) {
 	} else {
 		for (var i = 0; i < fullH; i++)
 			for (var j = 0; j < fullW; j++) {
-				var p = (i*fullW + j)<<2;
+				var p = i*fullW + j<<2;
 				for (var k = 0; k < 3; k++) {
 					var tmp = Math.exp(Math.log(pxData[p|k]/255)*2.2) * 2;
 					if (i+j & 1) pxData[p|k] = tmp>1 ? 255 : Math.exp(Math.log(tmp)*0.455)*255;
@@ -995,7 +994,6 @@ function lineEffect(size, type=0) {
 	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
-	var tmpPxArr = [];
 	var fullH = canvasB.height, fullW = canvasB.width;
 	if (size<=1) return;
 	
@@ -1010,7 +1008,7 @@ function lineEffect(size, type=0) {
 					if ((type&1)==1) d = type==1? 0.707107*Math.abs(rx + ry) : 0.707107*Math.abs(rx - ry);
 					else d = type==0? Math.abs(rx) : Math.abs(ry);
 					if (d > rmax) d = 2*rmax - d;
-					var p = (x*fullW + y)<<2;
+					var p = x*fullW + y<<2;
 					for (var k = 0; k < 3; k++) {
 						var r = (1 - Math.exp(Math.log(pxData[p|k]/255)*2.2)) * rmax;
 						var fill = d>0 ? d-r+0.5 : 1-2*r;
@@ -1030,4 +1028,139 @@ function lineEffect(size, type=0) {
 		}
 	
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
+}
+
+function fxaaEffect(type=0) { //refer to https://github.com/mattdesl/glsl-fxaa
+	function luma(color) {
+		return color.r*0.0012 + color.g*0.0023 + color.b*0.0004;
+	}
+	function getRGB(i, j, dir, ratio) {
+		i = Math.floor(i + dir.y*ratio + 0.5), j = Math.floor(j + dir.x*ratio + 0.5);
+		i = i<0 ? 0 : i>=fullH ? fullH-1 : i, j = j<0 ? 0 : j>=fullW ? fullW-1 : j;
+		var p = i*fullW + j<<2;
+		return {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+	}
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
+	var imgDataA = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+	var pxDataA = imgDataA.data;
+	var imgDataB = ctxB.getImageData(0, 0, canvasB.width, canvasB.height);
+	var pxDataB = imgDataB.data;
+	var fullH = canvasB.height, fullW = canvasB.width;
+	
+	for (var i = 0; i < fullH; i++)
+		for (var j = 0; j < fullW; j++) {
+			var prep = i*fullW + j;
+			var mi = i==0 ? 0 : -1, pi = i==fullH-1 ? 0 : 1;
+			var mj = j==0 ? 0 : -1, pj = j==fullW-1 ? 0 : 1;
+			var p = prep<<2, lumaMin, lumaMax, dir, range, blendL, rgbL;
+			var rgbM = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+			var lumaM = luma(rgbM); 
+			if (type == 0) {
+				//local contrast check
+				p = prep + mi*fullW + mj<<2;
+				var rgbNW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + mi*fullW + pj<<2;
+				var rgbNE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + pi*fullW + mj<<2;
+				var rgbSW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + pi*fullW + pj<<2;
+				var rgbSE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				var lumaNW = luma(rgbNW), lumaNE = luma(rgbNE), lumaSW = luma(rgbSW), lumaSE = luma(rgbSE);
+				lumaMin = Math.min(lumaM, lumaNW, lumaNE, lumaSW, lumaSE);
+				lumaMax = Math.max(lumaM, lumaNW, lumaNE, lumaSW, lumaSE);
+				range = lumaMax-lumaMin;
+				if (range < Math.max(0.12, lumaMax * 0.24)) {
+					p = prep<<2;
+					for (k = 0; k < 4; k++) pxDataB[p|k] = pxDataA[p|k];
+					continue;
+				}
+				dir = {x: lumaSW + lumaSE - lumaNW - lumaNE, y: lumaNW + lumaSW - lumaNE - lumaSE};
+				var rangeL = Math.abs((lumaNW + lumaNE + lumaSW + lumaSE)*0.25 - lumaM);
+				blendL = Math.max(0, (rangeL / range) - 0.5);
+				rgbL={r: (rgbNW.r + rgbNE.r + rgbSW.r + rgbSE.r)*0.25,
+					g: (rgbNW.g + rgbNE.g + rgbSW.g + rgbSE.g)*0.25,
+					b: (rgbNW.b + rgbNE.b + rgbSW.b + rgbSE.b)*0.25}
+			} else {
+				//local contrast check
+				p = prep + mi*fullW<<2;
+				var rgbN = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + pi*fullW<<2;
+				var rgbS = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + mj<<2;
+				var rgbW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + pj<<2;
+				var rgbE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				var lumaN = luma(rgbN), lumaS = luma(rgbS), lumaW = luma(rgbW), lumaE = luma(rgbE);
+				lumaMin = Math.min(lumaM, lumaN, lumaS, lumaW, lumaE);
+				lumaMax = Math.max(lumaM, lumaN, lumaS, lumaW, lumaE);
+				range = lumaMax-lumaMin;
+				if (range < Math.max(0.1, lumaMax * 0.2)) {
+					p = prep<<2;
+					for (k = 0; k < 4; k++) pxDataB[p|k] = pxDataA[p|k];
+					continue;
+				}
+				var lumaL = (lumaN + lumaS + lumaW + lumaE) * 0.25;
+				p = prep + mi*fullW + mj<<2;
+				var rgbNW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + mi*fullW + pj<<2;
+				var rgbNE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + pi*fullW + mj<<2;
+				var rgbSW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				p = prep + pi*fullW + pj<<2;
+				var rgbSE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
+				var lumaNW = luma(rgbNW), lumaNE = luma(rgbNE), lumaSW = luma(rgbSW), lumaSE = luma(rgbSE);
+				var tmp1 = (lumaN + lumaS - lumaW - lumaE)*0.5, tmp2 = lumaM - (lumaNW + lumaNE + lumaSW + lumaSE)*0.25;
+				dir = {x: (lumaS + lumaSW + lumaSE - lumaN - lumaNW - lumaNE)*0.667, y: (lumaW + lumaNW + lumaSW - lumaE - lumaNE - lumaSE)*0.667};
+				var rangeL = Math.abs((lumaN + lumaS + lumaW + lumaE + lumaNW + lumaNE + lumaSW + lumaSE)*0.125 - lumaM);
+				blendL = Math.max(0, (rangeL / range) - 0.5);
+				rgbL={r: (rgbN.r + rgbS.r + rgbW.r + rgbE.r + rgbNW.r + rgbNE.r + rgbSW.r + rgbSE.r)*0.125,
+					g: (rgbN.g + rgbS.g + rgbW.g + rgbE.g + rgbNW.g + rgbNE.g + rgbSW.g + rgbSE.g)*0.125,
+					b: (rgbN.b + rgbS.b + rgbW.b + rgbE.b + rgbNW.b + rgbNE.b + rgbSW.b + rgbSE.b)*0.125}
+			}
+			
+			var rcpDirMin = 1.0 / (Math.min(Math.abs(dir.x), Math.abs(dir.y)) + range*0.125);
+			dir.x *= rcpDirMin, dir.y *= rcpDirMin;
+			dir.x = dir.x>8 ? 8 : dir.x<-8 ? -8 : dir.x, dir.y = dir.y>8 ? 8 : dir.y<-8 ? -8 : dir.y
+			
+			var rgbTmp1 = getRGB(i, j, dir, 0.25), rgbTmp2 = getRGB(i, j, dir, -0.25);
+			var rgbA = {r: (rgbM.r + rgbTmp1.r + rgbTmp2.r)*0.333, g: (rgbM.g + rgbTmp1.g + rgbTmp2.g)*0.333, b: (rgbM.b + rgbTmp1.b + rgbTmp2.b)*0.333};
+			rgbTmp1 = getRGB(i, j, dir, 0.5), rgbTmp2 = rgbTmp2 = getRGB(i, j, dir, -0.5);
+			var rgbB = {r: (rgbTmp1.r + rgbTmp2.r)*0.5, g: (rgbTmp1.g + rgbTmp2.g)*0.5, b: (rgbTmp1.b + rgbTmp2.b)*0.5};
+			rgbB = {r: rgbA.r*0.6 + rgbB.r*0.4, g: rgbA.g*0.6 + rgbB.g*0.4, b: rgbA.b*0.6 + rgbB.b*0.4};
+			var lumaA = luma(rgbA), lumaB = luma(rgbB), lumaL = luma(rgbL);
+			var thresh = Math.abs(lumaL-lumaM);
+			
+			p = prep<<2;
+			if (Math.abs(lumaB-lumaM) < thresh) {
+				if (blendL>0) {
+					pxDataB[p] = rgbB.r*(1-blendL) + rgbL.r*blendL;
+					pxDataB[p|1] = rgbB.g*(1-blendL) + rgbL.g*blendL;
+					pxDataB[p|2] = rgbB.b*(1-blendL) + rgbL.b*blendL;
+				} else {
+					pxDataB[p] = rgbB.r, pxDataB[p|1] = rgbB.g, pxDataB[p|2] = rgbB.b;
+				}
+				pxDataB[p|3] = pxDataA[p|3];
+			} else if (Math.abs(lumaA-lumaM) < thresh) {
+				if (blendL>0) {
+					pxDataB[p] = rgbA.r*(1-blendL) + rgbL.r*blendL;
+					pxDataB[p|1] = rgbA.g*(1-blendL) + rgbL.g*blendL;
+					pxDataB[p|2] = rgbA.b*(1-blendL) + rgbL.b*blendL;
+				} else {
+					pxDataB[p] = rgbA.r, pxDataB[p|1] = rgbA.g, pxDataB[p|2] = rgbA.b;
+				}
+				pxDataB[p|3] = pxDataA[p|3];
+			} else {
+				if (blendL>0) {
+					pxDataB[p] = rgbM.r*(1-blendL) + rgbL.r*blendL;
+					pxDataB[p|1] = rgbM.g*(1-blendL) + rgbL.g*blendL;
+					pxDataB[p|2] = rgbM.b*(1-blendL) + rgbL.b*blendL;
+				} else {
+					pxDataB[p] = rgbM.r, pxDataB[p|1] = rgbM.g, pxDataB[p|2] = rgbM.b;
+				}
+				pxDataB[p|3] = pxDataA[p|3];
+			}
+		}
+	
+	ctxB.putImageData(imgDataB, 0, 0, 0, 0, fullW, fullH);
 }
