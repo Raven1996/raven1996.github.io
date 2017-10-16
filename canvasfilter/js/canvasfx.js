@@ -1047,6 +1047,13 @@ function fxaaEffect(type=0) { //refer to https://github.com/mattdesl/glsl-fxaa
 	var imgDataB = ctxB.getImageData(0, 0, canvasB.width, canvasB.height);
 	var pxDataB = imgDataB.data;
 	var fullH = canvasB.height, fullW = canvasB.width;
+	var lumaBuffer = [];
+	
+	for (var i = 0; i < fullH; i++)
+		for (var j = 0; j < fullW; j++) {
+			var prep = i*fullW + j, p = prep<<2;
+			lumaBuffer[prep] = pxDataA[p]*0.0012 + pxDataA[p|1]*0.0023 + pxDataA[p|2]*0.0004;
+		}
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
@@ -1054,22 +1061,21 @@ function fxaaEffect(type=0) { //refer to https://github.com/mattdesl/glsl-fxaa
 			var mi = i==0 ? 0 : -1, pi = i==fullH-1 ? 0 : 1;
 			var mj = j==0 ? 0 : -1, pj = j==fullW-1 ? 0 : 1;
 			var p = prep<<2, lumaMin, lumaMax, dir, range, blendL, rgbL;
-			var rgbM = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-			var lumaM = luma(rgbM); 
+			var lumaM = lumaBuffer[prep], rgbM = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
 			if (type == 0) {
 				//local contrast check
-				p = prep + mi*fullW + mj<<2;
+				var lumaNW, lumaNE, lumaSW, lumaSE;
+				p = prep + mi*fullW + mj; lumaNW = lumaBuffer[p]; p = p<<2;
 				var rgbNW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + mi*fullW + pj<<2;
+				p = prep + mi*fullW + pj; lumaNE = lumaBuffer[p]; p = p<<2;
 				var rgbNE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + pi*fullW + mj<<2;
+				p = prep + pi*fullW + mj; lumaSW = lumaBuffer[p]; p = p<<2;
 				var rgbSW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + pi*fullW + pj<<2;
+				p = prep + pi*fullW + pj; lumaSE = lumaBuffer[p]; p = p<<2;
 				var rgbSE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				var lumaNW = luma(rgbNW), lumaNE = luma(rgbNE), lumaSW = luma(rgbSW), lumaSE = luma(rgbSE);
 				lumaMin = Math.min(lumaM, lumaNW, lumaNE, lumaSW, lumaSE);
 				lumaMax = Math.max(lumaM, lumaNW, lumaNE, lumaSW, lumaSE);
-				range = lumaMax-lumaMin;
+				range = lumaMax - lumaMin;
 				if (range < Math.max(0.12, lumaMax * 0.24)) {
 					p = prep<<2;
 					for (k = 0; k < 4; k++) pxDataB[p|k] = pxDataA[p|k];
@@ -1077,46 +1083,44 @@ function fxaaEffect(type=0) { //refer to https://github.com/mattdesl/glsl-fxaa
 				}
 				dir = {x: lumaSW + lumaSE - lumaNW - lumaNE, y: lumaNW + lumaSW - lumaNE - lumaSE};
 				var rangeL = Math.abs((lumaNW + lumaNE + lumaSW + lumaSE)*0.25 - lumaM);
-				blendL = Math.max(0, (rangeL / range) - 0.5);
+				blendL = Math.min(Math.max(0, (rangeL / range) - 0.5), 0.5);
 				rgbL={r: (rgbNW.r + rgbNE.r + rgbSW.r + rgbSE.r)*0.25,
 					g: (rgbNW.g + rgbNE.g + rgbSW.g + rgbSE.g)*0.25,
 					b: (rgbNW.b + rgbNE.b + rgbSW.b + rgbSE.b)*0.25}
 			} else {
 				//local contrast check
-				p = prep + mi*fullW<<2;
+				var lumaN, lumaS, lumaW, lumaE;
+				p = prep + mi*fullW; lumaN = lumaBuffer[p]; p = p<<2;
 				var rgbN = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + pi*fullW<<2;
+				p = prep + pi*fullW; lumaS = lumaBuffer[p]; p = p<<2;
 				var rgbS = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + mj<<2;
+				p = prep + mj; lumaW = lumaBuffer[p]; p = p<<2;
 				var rgbW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + pj<<2;
+				p = prep + pj; lumaE = lumaBuffer[p]; p = p<<2;
 				var rgbE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				var lumaN = luma(rgbN), lumaS = luma(rgbS), lumaW = luma(rgbW), lumaE = luma(rgbE);
 				lumaMin = Math.min(lumaM, lumaN, lumaS, lumaW, lumaE);
 				lumaMax = Math.max(lumaM, lumaN, lumaS, lumaW, lumaE);
-				range = lumaMax-lumaMin;
+				range = lumaMax - lumaMin;
 				if (range < Math.max(0.1, lumaMax * 0.2)) {
 					p = prep<<2;
 					for (k = 0; k < 4; k++) pxDataB[p|k] = pxDataA[p|k];
 					continue;
 				}
-				var lumaL = (lumaN + lumaS + lumaW + lumaE) * 0.25;
-				p = prep + mi*fullW + mj<<2;
+				var lumaNW, lumaNE, lumaSW, lumaSE;
+				p = prep + mi*fullW + mj; lumaNW = lumaBuffer[p]; p = p<<2;
 				var rgbNW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + mi*fullW + pj<<2;
+				p = prep + mi*fullW + pj; lumaNE = lumaBuffer[p]; p = p<<2;
 				var rgbNE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + pi*fullW + mj<<2;
+				p = prep + pi*fullW + mj; lumaSW = lumaBuffer[p]; p = p<<2;
 				var rgbSW = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				p = prep + pi*fullW + pj<<2;
+				p = prep + pi*fullW + pj; lumaSE = lumaBuffer[p]; p = p<<2;
 				var rgbSE = {r: pxDataA[p], g: pxDataA[p|1], b: pxDataA[p|2]};
-				var lumaNW = luma(rgbNW), lumaNE = luma(rgbNE), lumaSW = luma(rgbSW), lumaSE = luma(rgbSE);
-				var tmp1 = (lumaN + lumaS - lumaW - lumaE)*0.5, tmp2 = lumaM - (lumaNW + lumaNE + lumaSW + lumaSE)*0.25;
-				dir = {x: (lumaS + lumaSW + lumaSE - lumaN - lumaNW - lumaNE)*0.667, y: (lumaW + lumaNW + lumaSW - lumaE - lumaNE - lumaSE)*0.667};
-				var rangeL = Math.abs((lumaN + lumaS + lumaW + lumaE + lumaNW + lumaNE + lumaSW + lumaSE)*0.125 - lumaM);
-				blendL = Math.max(0, (rangeL / range) - 0.5);
-				rgbL={r: (rgbN.r + rgbS.r + rgbW.r + rgbE.r + rgbNW.r + rgbNE.r + rgbSW.r + rgbSE.r)*0.125,
-					g: (rgbN.g + rgbS.g + rgbW.g + rgbE.g + rgbNW.g + rgbNE.g + rgbSW.g + rgbSE.g)*0.125,
-					b: (rgbN.b + rgbS.b + rgbW.b + rgbE.b + rgbNW.b + rgbNE.b + rgbSW.b + rgbSE.b)*0.125}
+				dir = {x: (lumaS - lumaN)*0.4 + (lumaSW + lumaSE - lumaNW - lumaNE)*0.8, y: (lumaW - lumaE)*0.4 + (lumaNW + lumaSW - lumaNE - lumaSE)*0.8};
+				var rangeL = Math.abs((lumaN + lumaS + lumaW + lumaE + (lumaNW + lumaNE + lumaSW + lumaSE)*0.75)*0.143 - lumaM);
+				blendL = Math.min(Math.max(0, (rangeL / range) - 0.5), 0.5);
+				rgbL={r: (rgbN.r + rgbS.r + rgbW.r + rgbE.r + (rgbNW.r + rgbNE.r + rgbSW.r + rgbSE.r)*0.75)*0.143,
+					g: (rgbN.g + rgbS.g + rgbW.g + rgbE.g + (rgbNW.g + rgbNE.g + rgbSW.g + rgbSE.g)*0.75)*0.143,
+					b: (rgbN.b + rgbS.b + rgbW.b + rgbE.b + (rgbNW.b + rgbNE.b + rgbSW.b + rgbSE.b)*0.75)*0.143}
 			}
 			
 			var rcpDirMin = 1.0 / (Math.min(Math.abs(dir.x), Math.abs(dir.y)) + range*0.125);
@@ -1128,8 +1132,7 @@ function fxaaEffect(type=0) { //refer to https://github.com/mattdesl/glsl-fxaa
 			rgbTmp1 = getRGB(i, j, dir, 0.5), rgbTmp2 = rgbTmp2 = getRGB(i, j, dir, -0.5);
 			var rgbB = {r: (rgbTmp1.r + rgbTmp2.r)*0.5, g: (rgbTmp1.g + rgbTmp2.g)*0.5, b: (rgbTmp1.b + rgbTmp2.b)*0.5};
 			rgbB = {r: rgbA.r*0.6 + rgbB.r*0.4, g: rgbA.g*0.6 + rgbB.g*0.4, b: rgbA.b*0.6 + rgbB.b*0.4};
-			var lumaA = luma(rgbA), lumaB = luma(rgbB), lumaL = luma(rgbL);
-			var thresh = Math.abs(lumaL-lumaM);
+			var lumaA = luma(rgbA), lumaB = luma(rgbB), thresh = Math.abs(luma(rgbL)-lumaM);
 			
 			p = prep<<2;
 			if (Math.abs(lumaB-lumaM) < thresh) {
@@ -1137,27 +1140,21 @@ function fxaaEffect(type=0) { //refer to https://github.com/mattdesl/glsl-fxaa
 					pxDataB[p] = rgbB.r*(1-blendL) + rgbL.r*blendL;
 					pxDataB[p|1] = rgbB.g*(1-blendL) + rgbL.g*blendL;
 					pxDataB[p|2] = rgbB.b*(1-blendL) + rgbL.b*blendL;
-				} else {
-					pxDataB[p] = rgbB.r, pxDataB[p|1] = rgbB.g, pxDataB[p|2] = rgbB.b;
-				}
+				} else pxDataB[p] = rgbB.r, pxDataB[p|1] = rgbB.g, pxDataB[p|2] = rgbB.b;
 				pxDataB[p|3] = pxDataA[p|3];
 			} else if (Math.abs(lumaA-lumaM) < thresh) {
 				if (blendL>0) {
 					pxDataB[p] = rgbA.r*(1-blendL) + rgbL.r*blendL;
 					pxDataB[p|1] = rgbA.g*(1-blendL) + rgbL.g*blendL;
 					pxDataB[p|2] = rgbA.b*(1-blendL) + rgbL.b*blendL;
-				} else {
-					pxDataB[p] = rgbA.r, pxDataB[p|1] = rgbA.g, pxDataB[p|2] = rgbA.b;
-				}
+				} else pxDataB[p] = rgbA.r, pxDataB[p|1] = rgbA.g, pxDataB[p|2] = rgbA.b;
 				pxDataB[p|3] = pxDataA[p|3];
 			} else {
 				if (blendL>0) {
 					pxDataB[p] = rgbM.r*(1-blendL) + rgbL.r*blendL;
 					pxDataB[p|1] = rgbM.g*(1-blendL) + rgbL.g*blendL;
 					pxDataB[p|2] = rgbM.b*(1-blendL) + rgbL.b*blendL;
-				} else {
-					pxDataB[p] = rgbM.r, pxDataB[p|1] = rgbM.g, pxDataB[p|2] = rgbM.b;
-				}
+				} else pxDataB[p] = rgbM.r, pxDataB[p|1] = rgbM.g, pxDataB[p|2] = rgbM.b;
 				pxDataB[p|3] = pxDataA[p|3];
 			}
 		}
