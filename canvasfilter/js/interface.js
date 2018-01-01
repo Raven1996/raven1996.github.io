@@ -160,6 +160,7 @@ function resetValues(index){
 			div[0].value=canvasA.width
 			div[1].value=canvasA.height
 			div[2].value="2.2"
+			div[3].value="0"
 			break
 		case 1:
 			div[0].value="0"
@@ -255,6 +256,7 @@ function updateValues(index){
 	switch(index){
 		case 0:
 			value[0].innerText=div[2].value
+            value[1].innerText=div[3].value
 			break
 		case 1:
 			value[0].innerText=div[0].value
@@ -321,7 +323,8 @@ function previewCanvas(index){
 		case 0:
 			resizeEffect(parseInt(div[0].value),
 				parseInt(div[1].value),
-				parseFloat(div[2].value))
+				parseFloat(div[2].value),
+				parseFloat(div[3].value))
 			break
 		case 1:
 			hslEffect(parseInt(div[0].value),

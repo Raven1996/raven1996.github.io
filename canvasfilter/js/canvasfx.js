@@ -23,16 +23,19 @@ function noEffect() {
 }
 
 
-function resizeEffect(width, height, gamma=2.2) {
-	canvasB.width = width
-	canvasB.height = height
+function resizeEffect(width, height, gamma=2.2, subpixel=0) {  // subpixel : 0 normal, 1 RGB, -1 BGR 
+	canvasB.width = width;
+	canvasB.height = height;
 	var imgDataA = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxDataA = imgDataA.data;
 	var imgDataB = ctxB.getImageData(0, 0, canvasB.width, canvasB.height);
 	var pxDataB = imgDataB.data;
 	var tmpPxArr = [];
 	var originW = canvasA.width, originH = canvasA.height;
-	var ratioW = originW/width, ratioH = originH/height
+	var ratioW = originW/width, ratioH = originH/height;
+	var type = subpixel>0 ? 1 : -1;
+	subpixel = Math.abs(subpixel);
+	var s1 = 1-subpixel, s2 = 3-s1*3;
 	
 	for (var i = 0; i < originH; i++)
 		for (var j = 0; j < originW; j++) {
@@ -49,27 +52,48 @@ function resizeEffect(width, height, gamma=2.2) {
 		for (var j = 0; j < width; j++) {
 			var lowH = i*ratioH, upH = i+1<height ? (i+1)*ratioH : originH;
 			var lowW = j*ratioW, upW = j+1<width ? (j+1)*ratioW : originW;
-			var totalR = 0, totalG = 0, totalB = 0, totalA = 0;
-			
-			for (var x = Math.floor(lowH); x < upH; x++)
-				for (var y = Math.floor(lowW); y < upW; y++) {
-					var a = 1, b = 1, pp = x*originW + y<<2;
-					if (lowH > x) a -= lowH-x;
+			var totalRGB = [0, 0, 0, 0], totalA = 0;
+			if (subpixel == 0) {
+				for (var x = Math.floor(lowH); x < upH; x++) {
+					var a = lowH>x ? x+1-lowH : 1;
 					if (x+1 > upH) a -= x+1-upH;
-					if (lowW > y) b -= lowW-y;
-					if (y+1 > upW) b -= y+1-upW;
-					var w = a*b;
-					totalR += w*tmpPxArr[pp];
-					totalG += w*tmpPxArr[pp|1];
-					totalB += w*tmpPxArr[pp|2];
-					totalA += w*tmpPxArr[pp|3];
+					for (var y = Math.floor(lowW); y < upW; y++) {
+						var pp = x*originW + y<<2;
+						var b = lowW>y ? y+1-lowW : 1;
+						if (y+1 > upW) b -= y+1-upW;
+						var w = a*b;
+						totalRGB[0] += w*tmpPxArr[pp];
+						totalRGB[1] += w*tmpPxArr[pp|1];
+						totalRGB[2] += w*tmpPxArr[pp|2];
+						totalA += w*tmpPxArr[pp|3];
+					}
 				}
-			
+			} else {
+				for (var k = -1; k <= 1; k++) {
+					var subLowW = (lowW*2 + upW + (upW-lowW)*k) / 3;
+					var subUpW = (lowW + upW*2 + (upW-lowW)*k) / 3;
+					for (var x = Math.floor(lowH); x < upH; x++) {
+						var a = lowH>x ? x+1-lowH : 1;
+						if (x+1 > upH) a -= x+1-upH;
+						for (var y = Math.floor(subLowW); y < subUpW; y++) {
+							var pp = x*originW + y<<2;
+							var b = subLowW>y ? y+1-subLowW : 1;
+							if (y+1 > subUpW) b -= y+1-subUpW;
+							var w = a*b;
+							totalRGB[0] += s1*w*tmpPxArr[pp];
+							totalRGB[1] += s1*w*tmpPxArr[pp|1];
+							totalRGB[2] += s1*w*tmpPxArr[pp|2];
+							totalRGB[1+type*k] += s2*w*tmpPxArr[pp|(1+type*k)];
+							totalA += w*tmpPxArr[pp|3];
+						}
+					}
+				}
+			}
 			var p = i*width + j<<2;
 			totalA += 0.00000001;
-			pxDataB[p] = Math.exp(Math.log(totalR/totalA) * gamma) * 255;
-			pxDataB[p|1] = Math.exp(Math.log(totalG/totalA) * gamma) * 255;
-			pxDataB[p|2] = Math.exp(Math.log(totalB/totalA) * gamma) * 255;
+			pxDataB[p] = Math.exp(Math.log(totalRGB[0]/totalA) * gamma) * 255;
+			pxDataB[p|1] = Math.exp(Math.log(totalRGB[1]/totalA) * gamma) * 255;
+			pxDataB[p|2] = Math.exp(Math.log(totalRGB[2]/totalA) * gamma) * 255;
 			pxDataB[p|3] = (totalA-0.00000001) / ratioH / ratioW * 255;
 		}
 	
@@ -277,9 +301,8 @@ function zoomHarrisEffect(strength, centerX=0.5, centerY=0.5) {  // Harris camer
 	
 	for (var i = 0; i < fullH; i++)
 		for (var j = 0; j < fullW; j++) {
-			var tmpRGB = [], tmpA = [];
+			var tmpRGB = [0, 0, 0], tmpA = [0, 0, 0];
 			for (var k = 0; k < 3; k++) {
-				tmpRGB[k] = 0, tmpA[k] = 0;
 				var x = centerY + (i-centerY)*ratio[k], y = centerX + (j-centerX)*ratio[k];
 				
 				if (x > fullH-1 || x < 0) {
