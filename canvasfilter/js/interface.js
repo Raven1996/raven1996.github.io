@@ -19,7 +19,7 @@ window.onload = function(){
 				canvasB.setAttribute('width', image.width)
 				canvasB.setAttribute('height', image.height)
 				ctxA.drawImage(image, 0, 0)
-				for (var i=0; i<14; i++) resetValues(i)
+				for (var i=0; i<15; i++) resetValues(i)
 				clickIndex(-1)
 				noEffect()
 				setScaleType(1)
@@ -73,11 +73,11 @@ function exportImg(){
 	var dataurl = canvasB.toDataURL('image/png')
 	//DataUrl to Blob
 	var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n)
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n)
-    }
-    var blob = new Blob([u8arr], {type:mime})
+		bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n)
+	while(n--){
+		u8arr[n] = bstr.charCodeAt(n)
+	}
+	var blob = new Blob([u8arr], {type:mime})
 	//save
 	var save = document.getElementById('saveimage')
 	save.href = URL.createObjectURL(blob)
@@ -105,7 +105,7 @@ function importFile(file){
 			ctxA.clearRect(0, 0, this.width, this.height)
 			ctxA.drawImage(this, 0, 0)
 			delete this
-			for (var i=0; i<14; i++) resetValues(i)
+			for (var i=0; i<15; i++) resetValues(i)
 			clickIndex(-1)
 			noEffect()
 			setScaleType(1)
@@ -194,7 +194,7 @@ function resetValues(index){
 			div[5].value="0.5"
 			break
 		case 7:
-			div[0].value="2"
+			div[0].value="5"
 			div[1].value="2.2"
 			div[2].value="0"
 			div[3].value="0.5"
@@ -231,6 +231,9 @@ function resetValues(index){
 		case 13:
 			div[0].value="0"
 			break
+		case 14:
+			div[0].value="0"
+			break
 	}
 }
 
@@ -256,7 +259,7 @@ function updateValues(index){
 	switch(index){
 		case 0:
 			value[0].innerText=div[2].value
-            value[1].innerText=div[3].value
+			value[1].innerText=div[3].value
 			break
 		case 1:
 			value[0].innerText=div[0].value
@@ -366,7 +369,7 @@ function previewCanvas(index){
 				parseFloat(div[5].value))
 			break
 		case 7:
-			lenBlurEffect(parseFloat(div[0].value),
+			fastLenBlurEffect(parseFloat(div[0].value),
 				parseFloat(div[1].value),
 				parseInt(div[2].value),
 				parseFloat(div[3].value),
@@ -401,6 +404,9 @@ function previewCanvas(index){
 				parseInt(div[1].value))
 			break
 		case 13:
+			ditherEffect(parseInt(div[0].value))
+			break
+		case 14:
 			fxaaEffect(parseInt(div[0].value))
 			break
 	}

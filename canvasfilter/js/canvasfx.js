@@ -418,7 +418,7 @@ function normalBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, center
 			case 2: ratio = Math.abs(i-centerY)*halfH_Re; break;  // horizontal
 			case 3: ratio = Math.abs(j-centerX)*halfW_Re;  // vertical
 			}
-			rArr[p]= radius * ratio + 1;
+			rArr[p]= radius * ratio + 0.01;
 			p = p << 2;
 			pxArr[p|3] = pxData[p|3] / 255;
 			pxArr[p] = Math.exp(Math.log(pxData[p]/255)*gamma) * pxArr[p|3];
@@ -502,7 +502,7 @@ function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=
 	canvasB.height = canvasA.height;
 	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
 	var pxData = imgData.data;
-	var tmpPxArr = [], pxArr = [], ij=[];
+	var tmpPxArr = [], pxArr = [], ij = [];
 	var fullH = canvasB.height, fullW = canvasB.width;
 	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
 	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW;
@@ -528,7 +528,7 @@ function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=
 			case 3: ratio = Math.abs(j-centerX)*halfW_Re;  // vertical
 			}
 			var r = radius * ratio;
-			var i0 = i-r, i1 = i+r+1, j0= j-r, j1 = j+r+1;
+			var i0 = i-r+0.495, i1 = i+r+0.505, j0= j-r+0.495, j1 = j+r+0.505;
 			ij[p] = i0>0? i0 : 0;
 			ij[p|1] = i1<fullH? i1 : fullH-0.00000001;
 			ij[p|2] = j0>0? j0 : 0;
@@ -578,14 +578,14 @@ function fastBlurEffect(radius, gamma=2.2, mask=0, type=0, centerX=0.5, centerY=
 	}
 	
 	for (var i = 0; i < fullH; i++)
-			for (var j = 0; j < fullW; j++) {
-				var p = i*fullW + j<<2;
-				pxArr[p|3] += 0.00000001;
-				pxData[p] = Math.exp(Math.log(pxArr[p]/pxArr[p|3]) * gamma) * 255;
-				pxData[p|1] = Math.exp(Math.log(pxArr[p|1]/pxArr[p|3]) * gamma) * 255;
-				pxData[p|2] = Math.exp(Math.log(pxArr[p|2]/pxArr[p|3]) * gamma) * 255;
-				pxData[p|3] = (pxArr[p|3]-0.00000001) * 255;
-			}
+		for (var j = 0; j < fullW; j++) {
+			var p = i*fullW + j<<2;
+			pxArr[p|3] += 0.00000001;
+			pxData[p] = Math.exp(Math.log(pxArr[p]/pxArr[p|3]) * gamma) * 255;
+			pxData[p|1] = Math.exp(Math.log(pxArr[p|1]/pxArr[p|3]) * gamma) * 255;
+			pxData[p|2] = Math.exp(Math.log(pxArr[p|2]/pxArr[p|3]) * gamma) * 255;
+			pxData[p|3] = (pxArr[p|3]-0.00000001) * 255;
+		}
 			
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
 }
@@ -640,7 +640,7 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 			case 2: ratio = Math.abs(i-centerY)*halfH_Re; break;  // horizontal
 			case 3: ratio = Math.abs(j-centerX)*halfW_Re;  // vertical
 			}
-			var blurR = radius * ratio + 1;
+			var blurR = radius * ratio;
 			var p = i*fullW + j<<2;
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0;
 			var blurR_x = Math.floor(blurR);
@@ -653,7 +653,7 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 				for (var dy = ybegin; dy <= yend; dy++) {
 					var wt = Math.abs(dy) <= wt1y ? 1 : blurR - Math.sqrt(dx*dx + dy*dy);  // to make a soft edge
 					// blurR - fastSqrt(dx*dx + dy*dy)
-					var pp = (i+dx)*fullW + j+dy<<2  ;
+					var pp = (i+dx)*fullW + j+dy<<2;
 					totalR += tmpPxArr[pp] * wt;
 					totalG += tmpPxArr[pp|1] * wt;
 					totalB += tmpPxArr[pp|2] * wt;
@@ -667,7 +667,7 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 			pxData[p|2] = Math.exp(Math.log(totalB/totalA) * gamma) * 255;
 			pxData[p|3] = (totalA-0.00000001) / totalW * 255;
 		}
-		
+	
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
 }
 
@@ -678,6 +678,129 @@ function lenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 	var dx = Math.cos(theta)*r;
 	var dy = Math.sin(theta)*r;
 */
+
+function fastLenBlurEffect(radius, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
+	// blur 40%
+	var samples22x = [0, 0.533333, 0.332528, -0.118678, -0.480517, -0.480517, -0.118678, 0.332528,
+					  1, 0.900969, 0.623490, 0.222521, -0.222521, -0.623490, -0.900969,
+					  -1, -0.900969, -0.623490, -0.222521, 0.222521, 0.623490, 0.900969];
+	var samples22y = [0, 0, 0.416977, 0.519962, 0.231405, -0.231405, -0.519962, -0.416977,
+					  0, 0.433884, 0.781832, 0.974928, 0.974928, 0.781832, 0.433884,
+					  0, -0.433884, -0.781832, -0.974928, -0.974928, -0.781832, -0.433884];
+	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+	var pxData = imgData.data;
+	var tmpPxArr = [], pxArr = [], ij = [], ratio = [];
+	var fullH = canvasB.height, fullW = canvasB.width;
+	var halfH = (fullH-1)*0.5, halfW = (fullW-1)*0.5;
+	var halfH_Re = 1 / halfH, halfW_Re = 1 / halfW;
+	var halfD_Re = 1 / Math.sqrt(halfW*halfW + halfH*halfH);
+	if (typeof(centerX) == "undefined") centerX = halfW;
+	else centerX *= fullW - 1;
+	if (typeof(centerY) == "undefined") centerY = halfH;
+	else centerY *= fullH - 1;
+	
+	for (var i = 0; i < fullH; i++)
+		for (var j = 0; j < fullW; j++) {
+			var p = i*fullW + j;
+			ratio[p] = 0;
+			switch(mask) {
+			case 0: ratio[p] = 1; break;  // none
+			case 1: ratio[p] = Math.sqrt((i-centerY)*(i-centerY)+(j-centerX)*(j-centerX))*halfD_Re; break;  // round
+			case 2: ratio[p] = Math.abs(i-centerY)*halfH_Re; break;  // horizontal
+			case 3: ratio[p] = Math.abs(j-centerX)*halfW_Re;  // vertical
+			}
+			var r = radius * ratio[p] * 0.18;
+			p = p << 2;
+			var i0 = i+0.5-r, i1 = i+r+0.51, j0= j-r+0.5, j1 = j+r+0.51;
+			ij[p] = i0>0? i0 : 0;
+			ij[p|1] = i1<fullH? i1 : fullH-0.00000001;
+			ij[p|2] = j0>0? j0 : 0;
+			ij[p|3] = j1<fullW? j1 : fullW-0.00000001;
+			tmpPxArr[p|3] = pxData[p|3] / 255;
+			tmpPxArr[p] = Math.exp(Math.log(pxData[p]/255)*gamma) * tmpPxArr[p|3];
+			tmpPxArr[p|1] = Math.exp(Math.log(pxData[p|1]/255)*gamma) * tmpPxArr[p|3];
+			tmpPxArr[p|2] = Math.exp(Math.log(pxData[p|2]/255)*gamma) * tmpPxArr[p|3];
+		}
+	
+	gamma = 1 / gamma;
+	
+	for (var i = 0; i < fullH; i++)
+		for (var j = 0; j < fullW; j++) {
+			var p = i*fullW + j;
+			var blurR = radius * ratio[p] * 0.8;
+			p = p << 2;
+			var totalW = 1, totalA = tmpPxArr[p|3],
+			totalR = tmpPxArr[p], totalG = tmpPxArr[p|1], totalB = tmpPxArr[p|2];
+			for (var k = 1; k < 22; k++) {
+				var x = i + Math.round(samples22x[k] * blurR);
+				var y = j + Math.round(samples22y[k] * blurR);
+				if (x >= 0 && x <= fullH-1 && y >= 0 && y <= fullW-1) {
+					var pp = x*fullW + y<<2;
+					totalR += tmpPxArr[pp];
+					totalG += tmpPxArr[pp|1];
+					totalB += tmpPxArr[pp|2];
+					totalA += tmpPxArr[pp|3];
+					totalW += 1;
+				}
+			}
+			totalA += 0.00000001;
+			pxArr[p] = totalR / totalA;
+			pxArr[p|1] = totalG / totalA;
+			pxArr[p|2] =  totalB / totalA ;
+			pxArr[p|3] = (totalA-0.00000001) / totalW;
+		}
+	
+	var time = 2;
+	while (time > 0) {
+		time--;
+		// 1st step : vertical blur
+		for (var i = 0; i < fullH; i++) {
+			for (var k = 0; k < 4; k++) {
+				var accum = [0];
+				for (var j = 0; j < fullW; j++) {
+					var p = i*fullW + j<<2;
+					accum[j+1] = accum[j] + pxArr[p|k];
+				}
+				for (var j = 0; j < fullW; j++) {
+					var p = i*fullW + j<<2;
+					var j0 = ij[p|2], j1 = ij[p|3], j0_= Math.floor(j0), j1_=Math.floor(j1);
+					tmpPxArr[p|k] = (j1_+1-j1)*accum[j1_] + (j1-j1_)*accum[j1_+1] - (j0_+1-j0)*accum[j0_] - (j0-j0_)*accum[j0_+1];
+					tmpPxArr[p|k] /= j1 - j0;
+				}
+			}
+		}
+		// 2rd step horizontal blur
+		for (var j = 0; j < fullW; j++) {
+			for (var k = 0; k < 4; k++) {
+				var accum = [0];
+				for (var i = 0; i < fullH; i++) {
+					var p = i*fullW + j<<2;
+					accum[i+1] = accum[i] + tmpPxArr[p|k];
+				}
+				for (var i = 0; i < fullH; i++) {
+					var p = i*fullW + j<<2;
+					var i0 = ij[p], i1 = ij[p|1], i0_= Math.floor(i0), i1_=Math.floor(i1);
+					pxArr[p|k] = (i1_+1-i1)*accum[i1_] + (i1-i1_)*accum[i1_+1] - (i0_+1-i0)*accum[i0_] - (i0-i0_)*accum[i0_+1];
+					pxArr[p|k] /= i1 - i0;
+				}
+			}
+		}
+	}
+	
+	for (var i = 0; i < fullH; i++)
+		for (var j = 0; j < fullW; j++) {
+			var p = i*fullW + j<<2;
+			pxArr[p|3] += 0.00000001;
+			pxData[p] = Math.exp(Math.log(pxArr[p]/pxArr[p|3]) * gamma) * 255;
+			pxData[p|1] = Math.exp(Math.log(pxArr[p|1]/pxArr[p|3]) * gamma) * 255;
+			pxData[p|2] = Math.exp(Math.log(pxArr[p|2]/pxArr[p|3]) * gamma) * 255;
+			pxData[p|3] = (pxArr[p|3]-0.00000001) * 255;
+		}
+	
+	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
+}
 
 function motionBlurEffect(length, degree, gamma=2.2, mask=0, centerX=0.5, centerY=0.5) {
 	canvasB.width = canvasA.width;
@@ -731,7 +854,7 @@ function motionBlurEffect(length, degree, gamma=2.2, mask=0, centerX=0.5, center
 			var blurR = length * ratio * ratioR;
 			var p = i*fullW + j<<2;
 			var totalW = 0, totalR = 0, totalG = 0, totalB = 0, totalA = 0;
-			blurR = Math.abs(blurR) + 1;
+			blurR = Math.abs(blurR);
 			var blurR_ = Math.floor(blurR);
 			for (var dk = -blurR_; dk <= blurR_; dk++) {
 				var x = i + dk*ratioX, y = j + dk*ratioY;
@@ -816,11 +939,11 @@ function zoomBlurEffect(strength, gamma=2.2, type=0, centerX=0.5, centerY=0.5) {
 			}
 			var blurR, ratioX, ratioY;
 			if (zoomX_ >= zoomY_) {
-				blurR = zoomX_ + 1;
+				blurR = zoomX_ + 0.000001;
 				ratioX = zoomX > 0 ? 1 : -1;
 				ratioY = zoomY / zoomX_;
 			} else {
-				blurR = zoomY_ + 1;
+				blurR = zoomY_ + 0.000001;
 				ratioX = zoomX / zoomY_;
 				ratioY = zoomY > 0 ? 1 : -1;
 			}
@@ -830,7 +953,7 @@ function zoomBlurEffect(strength, gamma=2.2, type=0, centerX=0.5, centerY=0.5) {
 			for (var dk = 0; dk <= blurR_; dk++) {
 				var x = i + dk*ratioX, y = j + dk*ratioY;
 				var ratio = dk / blurR;
-				if (ratio == 0) ratio = 0.5 / blurR;  // prevent cracks
+				if (ratio == 0) ratio = blurR>1 ? 0.5/blurR : 0.5;  // prevent cracks
 				var wt = blurR - dk;  // to make a soft edge
 				if (wt > 1) wt = 1;
 				wt *= type == 0 ? 1 : ratio * (1-ratio);
@@ -1050,6 +1173,51 @@ function lineEffect(size, type=0) {
 				}
 		}
 	
+	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
+}
+
+function ditherEffect(mask = 0) {
+	canvasB.width = canvasA.width;
+	canvasB.height = canvasA.height;
+	var dither16 = [52, 191, 109, 210,
+					227, 143, 243, 169,
+					127, 219, 86, 201,
+					251, 180, 236, 156]
+	var dither25 = [199, 70, 211, 147, 243,
+					222, 138, 238, 186, 104,
+					247, 179, 43, 205, 156,
+					116, 227, 128, 233, 192,
+					164, 252, 171, 89, 216]
+	var dither64 = [28, 187, 101, 207, 58, 192, 112, 211,
+					224, 137, 240, 164, 228, 145, 244, 170,
+					121, 216, 76, 197, 129, 220, 90, 202,
+					248, 176, 233, 151, 252, 182, 237, 158,
+					68, 195, 116, 213, 46, 189, 107, 209,
+					231, 148, 246, 173, 226, 141, 242, 167,
+					133, 222, 96, 204, 125, 218, 83, 199,
+					254, 184, 239, 161, 250, 179, 235, 155];
+	var imgData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+	var pxData = imgData.data;
+	var fullH = canvasB.height, fullW = canvasB.width;
+	
+	for (var i = 0; i < fullH; i++)
+		for (var j = 0; j < fullW; j++) {
+			var p = i*fullW + j<<2;
+			var ref = 0;
+			switch(mask){
+				case 0 :
+					ref = dither16[((i&3)<<2) + (j&3)];
+					break;
+				case 1 :
+					ref = dither25[i%5 * 5 + j%5];
+					break;
+				case 2 :
+					ref = dither64[((i&7)<<3) + (j&7)];
+			}
+			for (k = 0; k < 3; k++)
+				pxData[p|k] = pxData[p|k] > ref ? 255 : 0;
+		}
+
 	ctxB.putImageData(imgData, 0, 0, 0, 0, fullW, fullH);
 }
 

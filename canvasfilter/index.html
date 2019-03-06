@@ -112,7 +112,7 @@
 				<a class="applybuttom inactive" onclick="applyEffect();resetValues(7);clickIndex(7)">apply</a>
 				<p class="filtername" onclick="clickIndex(7)">Len Blur</p>
 				<div class="ctrldiv inactive">
-					<label>radius</label><input type="range" max="25" min="1" step="1" class="div7" onchange="previewCanvas(7)" oninput="updateValues(7)"/><p class="num value7"></p><br />
+					<label>radius</label><input type="range" max="50" min="1" step="1" class="div7" onchange="previewCanvas(7)" oninput="updateValues(7)"/><p class="num value7"></p><br />
 					<label>gamma</label><input type="range" max="5" min="0.2" step="0.1" class="div7" onchange="previewCanvas(7)" oninput="updateValues(7)"/><p class="num value7"></p><br />
 					<label>mask</label><select class="div7" onchange="previewCanvas(7)">   
 						<option value="0">none</option>
@@ -192,9 +192,20 @@
 			</div>
 			<div class="filterdiv">
 				<a class="applybuttom inactive" onclick="applyEffect();resetValues(13);clickIndex(13)">apply</a>
-				<p class="filtername" onclick="clickIndex(13)">FXAA</p>
+				<p class="filtername" onclick="clickIndex(13)">Dither</p>
 				<div class="ctrldiv inactive">
-					<label>type</label><select class="div13" onchange="previewCanvas(13)">   
+					<label>mask</label><select class="div13" onchange="previewCanvas(13)">   
+						<option value="0">4x4</option>
+						<option value="1">5x5</option>
+                        <option value="2">8x8</option>
+					</select>
+				</div>
+			</div>
+			<div class="filterdiv">
+				<a class="applybuttom inactive" onclick="applyEffect();resetValues(14);clickIndex(14)">apply</a>
+				<p class="filtername" onclick="clickIndex(14)">FXAA</p>
+				<div class="ctrldiv inactive">
+					<label>type</label><select class="div14" onchange="previewCanvas(14)">   
 						<option value="0">speed</option>
 						<option value="1">quality</option>
 					</select>
